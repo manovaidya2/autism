@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Layout from "./components/Layout";
 import AdminAddBlog from "./pages/AdminAddBlog";
+import TeenageBlog from "./pages/TeenageBlog";
 
 
 
@@ -16,7 +17,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
          <Route path="/Admin-Blog" element={<Layout><AdminAddBlog/></Layout>} />
-        
+        <Route path="/Admin-Teenage" element={<Layout><TeenageBlog/></Layout>} />
       
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

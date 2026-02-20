@@ -4,6 +4,7 @@
       import dotenv from "dotenv";
       dotenv.config();
       import blogRoutes from "./routes/blogRoutes.js";
+      import teenageBlogRoutes from "./routes/teenageBlogRoutes.js";
 
 
       const app = express();
@@ -28,6 +29,7 @@
     //use routes
   
    app.use("/api/blogs", blogRoutes);
+app.use("/api", teenageBlogRoutes);
 
 
 

@@ -41,17 +41,17 @@ const Sidebar = () => {
               to="/Admin-Blog"
               className="flex items-center gap-3 px-3 py-2 rounded hover:bg-blue-800 transition"
             >
-              <FaChild /> Blogs
+              <FaChild /> Autism Blogs
             </Link>
           </li>
 
           {/* Therapists */}
           <li className="mb-2">
             <Link
-              to="/therapists"
+              to="/Admin-Teenage"
               className="flex items-center gap-3 px-3 py-2 rounded hover:bg-blue-800 transition"
             >
-              <FaUserMd /> Therapists
+              <FaUserMd /> Teenage Blogs
             </Link>
           </li>
 
