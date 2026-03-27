@@ -26,8 +26,8 @@ function App() {
         <Route path="/Admin-Teenage" element={<Layout><TeenageBlog/></Layout>} />
         <Route path="/Admin-Adult" element={<Layout><AdultBlog/></Layout>} />
          <Route path="/Admin-Autism" element={<Layout><AutismContactPanel/></Layout>} />
-           <Route path="/admin-addblog" element={<AdminAddBlog />} />
-           <Route path="/admin/edit-blog/:id" element={<AutismEditBlog/>} />
+           <Route path="/admin-addblog" element={<Layout><AdminAddBlog/></Layout>} />
+           <Route path="/admin/edit-blog/:id" element={<Layout><AutismEditBlog/></Layout>} />
     
         </Routes>
       </Router>

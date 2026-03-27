@@ -24,17 +24,34 @@ export default function AutismEditBlog() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [originalImage, setOriginalImage] = useState("");
+  const [error, setError] = useState(null);
 
   // Fetch blog data on component mount
   useEffect(() => {
-    fetchBlogData();
+    if (id) {
+      fetchBlogData();
+    } else {
+      setError("No blog ID provided");
+      setLoading(false);
+    }
   }, [id]);
 
   const fetchBlogData = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get(`/blogs/${id}`);
+      setError(null);
+      
+      console.log("Fetching blog with ID:", id);
+      // FIXED: Use the admin route for fetching blog by ID
+      const response = await axiosInstance.get(`/blogs/admin/${id}`);
+      console.log("Response received:", response.data);
+      
       const blog = response.data;
+      
+      // Check if blog exists
+      if (!blog) {
+        throw new Error("Blog not found");
+      }
       
       setFormData({
         title: blog.title || "",
@@ -58,8 +75,27 @@ export default function AutismEditBlog() {
       }, 100);
     } catch (error) {
       console.error("Error fetching blog:", error);
-      alert("Failed to fetch blog data");
-      navigate("/admin-blogs");
+      
+      let errorMessage = "Failed to fetch blog data";
+      
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        
+        if (error.response.status === 404) {
+          errorMessage = "Blog not found. It may have been deleted or the ID is incorrect.";
+        } else if (error.response.status === 500) {
+          errorMessage = "Server error. Please try again later.";
+        } else {
+          errorMessage = error.response.data?.message || `Error ${error.response.status}: Failed to fetch blog`;
+        }
+      } else if (error.request) {
+        errorMessage = "No response from server. Please check your internet connection.";
+      } else {
+        errorMessage = error.message || "An error occurred while fetching the blog";
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -173,7 +209,8 @@ export default function AutismEditBlog() {
     console.log("Updating blog data:", blogData);
 
     try {
-      const response = await axiosInstance.put(`/blogs/${id}`, blogData);
+      // FIXED: Use the admin route for updating
+      const response = await axiosInstance.put(`/blogs/admin/${id}`, blogData);
       console.log("Response:", response.data);
       
       if (response.data.success) {
@@ -205,6 +242,42 @@ export default function AutismEditBlog() {
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading blog data...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="p-8 bg-gray-50 min-h-screen">
+        <div className="max-w-5xl mx-auto bg-white rounded-3xl p-8 border shadow">
+          <div className="text-center">
+            <div className="text-red-500 text-6xl mb-4">⚠️</div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Error Loading Blog</h2>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={fetchBlogData}
+                className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600"
+              >
+                Try Again
+              </button>
+              <button
+                onClick={() => navigate("/admin-blogs")}
+                className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600"
+              >
+                Back to Blogs
+              </button>
+            </div>
+            <div className="mt-8 p-4 bg-gray-100 rounded-lg text-left">
+              <p className="text-sm text-gray-600 font-mono">
+                <strong>Debug Info:</strong><br />
+                Blog ID: {id}<br />
+                API URL: /blogs/admin/{id}<br />
+                Please verify that this blog exists in the database.
+              </p>
+            </div>
           </div>
         </div>
       </section>
