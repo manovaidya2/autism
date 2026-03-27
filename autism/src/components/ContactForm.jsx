@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, User, FileText, AlertCircle, CheckCircle } from 'lucide-react';
+import axiosInstance from '../api/axiosInstance'; // Adjust the path as needed
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const ContactForm = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const validateForm = () => {
     const newErrors = {};
@@ -32,42 +34,68 @@ const ContactForm = () => {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
+    // Clear submit error when user starts typing
+    if (submitError) setSubmitError('');
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  const newErrors = validateForm();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const newErrors = validateForm();
 
-  if (Object.keys(newErrors).length > 0) {
-    setErrors(newErrors);
-    return;
-  }
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
-  setIsSubmitting(true);
+    setIsSubmitting(true);
+    setSubmitError('');
 
-  try {
-    await fetch("http://localhost:5008/api/autism/contact/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-
-    setIsSubmitted(true);
-    setFormData({
-      fullName: "",
-      email: "",
-      phone: "",
-      address: "",
-      message: "",
-    });
-  } catch (err) {
-    console.error(err);
-  }
-
-  setIsSubmitting(false);
-};
+    try {
+      const response = await axiosInstance.post('/autism/contact/create', formData);
+      
+      if (response.data.success || response.status === 200 || response.status === 201) {
+        setIsSubmitted(true);
+        setFormData({
+          fullName: "",
+          email: "",
+          phone: "",
+          address: "",
+          message: "",
+        });
+        // Auto-hide success message after 5 seconds
+        setTimeout(() => {
+          setIsSubmitted(false);
+        }, 5000);
+      } else {
+        setSubmitError(response.data.message || 'Failed to send message. Please try again.');
+      }
+    } catch (err) {
+      console.error('Error submitting form:', err);
+      
+      if (err.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error('Error response data:', err.response.data);
+        console.error('Error response status:', err.response.status);
+        
+        if (err.response.status === 400) {
+          setSubmitError(err.response.data.message || 'Invalid form data. Please check your inputs.');
+        } else if (err.response.status === 500) {
+          setSubmitError('Server error. Please try again later.');
+        } else {
+          setSubmitError(err.response.data.message || 'Failed to send message. Please try again.');
+        }
+      } else if (err.request) {
+        // The request was made but no response was received
+        setSubmitError('No response from server. Please check your internet connection.');
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setSubmitError('An error occurred. Please try again.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
@@ -108,7 +136,7 @@ const ContactForm = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-slate-800">Email</h3>
-                   <p className="text-slate-600 text-medium">info@manovaidya.help</p>
+                  <p className="text-slate-600 text-medium">info@manovaidya.help</p>
                   <p className="text-slate-600 text-medium">manovaidya2@gmail.com</p>
                   <p className="text-medium text-slate-400">Support & Inquiries</p>
                 </div>
@@ -120,18 +148,18 @@ const ContactForm = () => {
                 <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg shadow-md">
                   <MapPin className="w-4 h-4 text-white" />
                 </div>
-              <div>
-  <h3 className="text-lg font-bold text-slate-800">Address</h3>
-  <p className="text-slate-600 text-medium">
-    VS Plaza, near Vinayak Hospital
-  </p>
-  <p className="text-slate-600 text-medium">
-    Atta Market, Pocket E, Sector 27
-  </p>
-  <p className="text-slate-600 text-medium">
-    Noida, Uttar Pradesh 201301
-  </p>
-</div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-800">Address</h3>
+                  <p className="text-slate-600 text-medium">
+                    VS Plaza, near Vinayak Hospital
+                  </p>
+                  <p className="text-slate-600 text-medium">
+                    Atta Market, Pocket E, Sector 27
+                  </p>
+                  <p className="text-slate-600 text-medium">
+                    Noida, Uttar Pradesh 201301
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -152,10 +180,19 @@ const ContactForm = () => {
 
           {/* Form Section - Compact Two-Row Layout */}
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            {/* Success Message */}
             {isSubmitted && (
               <div className="m-4 mb-0 bg-emerald-50 border border-emerald-200 rounded-lg p-3 flex items-center space-x-2 animate-in slide-in-from-top-2 duration-300">
                 <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                 <p className="text-emerald-700 text-xs">Message sent successfully! We'll get back to you soon.</p>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {submitError && (
+              <div className="m-4 mb-0 bg-red-50 border border-red-200 rounded-lg p-3 flex items-center space-x-2 animate-in slide-in-from-top-2 duration-300">
+                <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+                <p className="text-red-700 text-xs">{submitError}</p>
               </div>
             )}
             
@@ -247,7 +284,7 @@ const ContactForm = () => {
                     value={formData.address}
                     onChange={handleChange}
                     className={`w-full px-3 py-2 text-sm border ${errors.address ? 'border-red-400 bg-red-50' : 'border-slate-200'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
-                    placeholder="123 Main St, City, Country"
+                    placeholder="VS Plaza, near Vinayak Hospital, Noida"
                   />
                   {errors.address && (
                     <p className="mt-1 text-xs text-red-500 flex items-center space-x-1">
