@@ -21,12 +21,12 @@ const ProgramIncludes = () => {
           {/* List */}
           <ul className="space-y-6">
             {[
-              "Comprehensive developmental assessment",
-              "Personalized care roadmap with measurable goals",
-              "Regular therapy sessions (behavioral, speech, occupational)",
-              "Ayurvedic supplements for cognitive and nervous system support",
-              "Parent training and guidance sessions",
-              "Progress tracking with monthly review calls",
+              "Initial wellness assessment with teen and parent",
+              "Personalized mental wellness plan",
+              "Weekly one-on-one guidance sessions",
+              "Mindfulness and focus training modules",
+              "Sleep hygiene and routine optimization",
+              "Parent collaboration and progress updates",
             ].map((item, index) => (
               <li key={index} className="flex items-start gap-4">
                 <CheckCircle className="text-green-700 w-5 h-5 mt-1" />
@@ -45,14 +45,14 @@ const ProgramIncludes = () => {
             <div>
               <p className="text-sm text-gray-500 mb-1">Duration Options</p>
               <p className="font-medium text-gray-900">
-                3 months / 6 months / 12 months
+                1 month / 3 months / 6 months
               </p>
             </div>
 
             <div>
               <p className="text-sm text-gray-500 mb-1">Support Mode</p>
               <p className="font-medium text-gray-900">
-                Online + In-clinic options available
+                Online sessions + WhatsApp support
               </p>
             </div>
           </div>

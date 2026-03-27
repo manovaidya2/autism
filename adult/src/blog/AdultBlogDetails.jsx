@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 
-export default function TeenageBlogDetails() {
+export default function AdultBlogDetails() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const [blog, setBlog] = useState(null);
@@ -13,12 +13,12 @@ export default function TeenageBlogDetails() {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const res = await axiosInstance.get(`/teenage-blogs/${slug}`);
+        const res = await axiosInstance.get(`/adult-blogs/${slug}`);
         setBlog(res.data.data);
         
         // Fetch related blogs (same category)
         if (res.data.data.category) {
-          const relatedRes = await axiosInstance.get("/teenage-blogs");
+          const relatedRes = await axiosInstance.get("/adult-blogs");
           const related = relatedRes.data.data
             .filter(b => b.category === res.data.data.category && b.slug !== slug)
             .slice(0, 3);
@@ -37,9 +37,9 @@ export default function TeenageBlogDetails() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-purple-400 border-t-transparent"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-400 border-t-transparent"></div>
           <p className="mt-4 text-gray-600">Loading your story...</p>
         </div>
       </div>
@@ -48,7 +48,7 @@ export default function TeenageBlogDetails() {
 
   if (error || !blog) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center px-4">
         <div className="text-center bg-white p-8 rounded-2xl shadow-xl max-w-md">
           <svg className="w-16 h-16 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -56,8 +56,8 @@ export default function TeenageBlogDetails() {
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Oops!</h2>
           <p className="text-gray-600 mb-6">{error || "Blog not found"}</p>
           <button
-            onClick={() => navigate('/teenage-blogs')}
-            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+            onClick={() => navigate('/adult-blogs')}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
             Browse All Blogs
           </button>
@@ -67,7 +67,7 @@ export default function TeenageBlogDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Hero Section with Image */}
       <div className="relative h-[40vh] md:h-[50vh] overflow-hidden">
         <img
@@ -79,7 +79,7 @@ export default function TeenageBlogDetails() {
         
         {/* Back Button */}
         <button
-          onClick={() => navigate('/teenage-blogs')}
+          onClick={() => navigate('/adult-blogs')}
           className="absolute top-6 left-6 z-10 flex items-center px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/30 transition"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,7 +92,7 @@ export default function TeenageBlogDetails() {
         <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
           <div className="max-w-4xl mx-auto">
             {blog.category && (
-              <span className="inline-block px-3 py-1 bg-purple-600 rounded-full text-xs font-semibold mb-4">
+              <span className="inline-block px-3 py-1 bg-blue-600 rounded-full text-xs font-semibold mb-4">
                 {blog.category}
               </span>
             )}
@@ -117,7 +117,7 @@ export default function TeenageBlogDetails() {
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* Short Description */}
         {blog.shortDescription && (
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border-l-4 border-purple-400">
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border-l-4 border-blue-400">
             <p className="text-lg text-gray-700 italic">
               "{blog.shortDescription}"
             </p>
@@ -162,7 +162,7 @@ export default function TeenageBlogDetails() {
               {relatedBlogs.map(related => (
                 <Link
                   key={related._id}
-                  to={`/teenage-blog/${related.slug}`}
+                  to={`/adult-blog/${related.slug}`}
                   className="group bg-white rounded-xl shadow-md hover:shadow-xl transition overflow-hidden"
                 >
                   <img
@@ -171,7 +171,7 @@ export default function TeenageBlogDetails() {
                     className="h-40 w-full object-cover group-hover:scale-105 transition"
                   />
                   <div className="p-4">
-                    <h4 className="font-semibold text-gray-800 group-hover:text-purple-600 transition line-clamp-2">
+                    <h4 className="font-semibold text-gray-800 group-hover:text-blue-600 transition line-clamp-2">
                       {related.title}
                     </h4>
                   </div>
@@ -184,8 +184,8 @@ export default function TeenageBlogDetails() {
         {/* Navigation */}
         <div className="mt-8 flex justify-between">
           <button
-            onClick={() => navigate('/teenage-blogs')}
-            className="flex items-center text-purple-600 hover:text-purple-700 font-semibold"
+            onClick={() => navigate('/adult-blogs')}
+            className="flex items-center text-blue-600 hover:text-blue-700 font-semibold"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -238,7 +238,7 @@ export default function TeenageBlogDetails() {
           margin-bottom: 0.5rem;
         }
         .blog-content blockquote {
-          border-left: 4px solid #c084fc;
+          border-left: 4px solid #3b82f6;
           background: #f9fafb;
           padding: 1rem 2rem;
           margin: 2rem 0;

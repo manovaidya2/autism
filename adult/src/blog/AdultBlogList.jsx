@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 
-export default function TeenageBlogList() {
+export default function AdultBlogList() {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,7 +12,7 @@ export default function TeenageBlogList() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const res = await axiosInstance.get("/teenage-blogs");
+        const res = await axiosInstance.get("/adult-blogs");
         setBlogs(res.data.data || []);
       } catch (error) {
         console.error("Error fetching blogs", error);
@@ -38,9 +38,9 @@ export default function TeenageBlogList() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-purple-400 border-t-transparent"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-400 border-t-transparent"></div>
           <p className="mt-4 text-gray-600">Loading amazing blogs...</p>
         </div>
       </div>
@@ -49,12 +49,12 @@ export default function TeenageBlogList() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center bg-white p-8 rounded-2xl shadow-xl">
           <p className="text-red-500 mb-4">{error}</p>
           <button 
             onClick={() => window.location.reload()}
-            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             Try Again
           </button>
@@ -64,14 +64,14 @@ export default function TeenageBlogList() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+      <div className="relative bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
         <div className="absolute inset-0 bg-black opacity-20"></div>
         <div className="relative max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Teenage Voices</h1>
-          <p className="text-xl text-purple-100 max-w-2xl mx-auto">
-            Stories, experiences, and wisdom from the teenage perspective
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Adult Voices</h1>
+          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+            Professional insights, life experiences, and wisdom from the adult perspective
           </p>
         </div>
       </div>
@@ -86,7 +86,7 @@ export default function TeenageBlogList() {
               placeholder="Search blogs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-3 pl-12 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400 focus:border-transparent"
+              className="w-full px-4 py-3 pl-12 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:border-transparent"
             />
             <svg className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -102,8 +102,8 @@ export default function TeenageBlogList() {
                   onClick={() => setSelectedCategory(category)}
                   className={`px-6 py-2 rounded-full font-medium transition-all transform hover:-translate-y-0.5 ${
                     selectedCategory === category
-                      ? 'bg-purple-600 text-white shadow-lg'
-                      : 'bg-white text-gray-600 hover:bg-purple-50 hover:text-purple-600 shadow'
+                      ? 'bg-blue-600 text-white shadow-lg'
+                      : 'bg-white text-gray-600 hover:bg-blue-50 hover:text-blue-600 shadow'
                   }`}
                 >
                   {category === "all" ? "All Posts" : category}
@@ -138,7 +138,7 @@ export default function TeenageBlogList() {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                   {blog.category && (
-                    <span className="absolute top-4 left-4 px-3 py-1 bg-purple-600 text-white text-xs font-semibold rounded-full">
+                    <span className="absolute top-4 left-4 px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full">
                       {blog.category}
                     </span>
                   )}
@@ -146,7 +146,7 @@ export default function TeenageBlogList() {
 
                 {/* Content */}
                 <div className="p-6">
-                  <h2 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2 group-hover:text-purple-600 transition">
+                  <h2 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2 group-hover:text-blue-600 transition">
                     {blog.title}
                   </h2>
                   
@@ -165,8 +165,8 @@ export default function TeenageBlogList() {
                     </time>
                     
                     <Link
-                      to={`/teenage-blog/${blog.slug}`}
-                      className="inline-flex items-center text-purple-600 font-semibold text-sm group-hover:text-purple-700"
+                      to={`/adult-blog/${blog.slug}`}
+                      className="inline-flex items-center text-blue-600 font-semibold text-sm group-hover:text-blue-700"
                     >
                       Read More
                       <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,66 +1,107 @@
 import React from "react";
-import { Calendar, MessageCircle, ShieldCheck, User, HeartHandshake } from "lucide-react";
-import { Brain } from "lucide-react";
+import { FaCheckCircle } from "react-icons/fa";
+import imghero from "../images/hero.jpeg";
 
-
-const Hero = () => {
+export default function HeroSection() {
   return (
-   <section id="program" className="bg-[#fbfdfb]">
-      <div className="max-w-5xl mx-auto px-6 py-20 text-center">
+    <section className="w-full py-6 sm:py-8 px-4 sm:px-6 md:px-20 bg-gradient-to-r from-[#f6f8fc] via-[#f8f9fc] to-[#f4e7c5]">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 md:gap-16">
 
-       
-        {/* Icon */}
-        <div className="flex justify-center mb-6">
-          <div className="h-14 w-14 bg-purple-600 rounded-2xl flex items-center justify-center">
-  <Brain className="text-white w-7 h-7" />
-</div>
+        {/* LEFT */}
+        <div className="flex-1 max-w-xl text-center md:text-left">
 
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 bg-[#eef3ff] text-[#5b8cff] text-[11px] sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full mb-4 sm:mb-5 shadow-sm">
+            <span>🛡️</span>
+            Brain–Gut–Neurodevelopment Approach
+          </div>
+
+          {/* Heading */}
+          <h1 className="text-[22px] sm:text-[30px] md:text-[40px] font-bold text-[#1a1a2e] leading-[1.3] sm:leading-[1.25]">
+            Real Progress in Autism & ADHD{" "}
+            <span className="text-[#6c8ef5] block sm:inline">
+              Is Possible — With the Right Approach
+            </span>
+          </h1>
+
+          {/* Text */}
+          <p className="mt-3 sm:mt-4 text-[#6b7280] text-[13.5px] sm:text-[15.5px] leading-[1.6]">
+            Most parents are told to "wait and watch" or that therapy alone is
+            enough. But when the brain isn't neurologically ready, even the best
+            therapies fall short.
+          </p>
+
+          <p className="mt-2 sm:mt-3 text-[#2c2c2c] text-[13.5px] sm:text-[15.5px] leading-[1.6] font-medium">
+            Manovaidya's{" "}
+            <span className="font-semibold">
+              Brain–Gut–Neurodevelopment system
+            </span>{" "}
+            prepares your child's brain for real, lasting improvement.
+          </p>
+
+          {/* Buttons */}
+          <div className="mt-5 sm:mt-6 flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
+            <a
+              href="https://manovaidya.com/Pages/mind-health"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto inline-block bg-[#6c8ef5] hover:bg-[#5a7df0] text-white px-5 sm:px-6 py-3 rounded-xl text-sm font-medium shadow-md text-center"
+            >
+              → Take Free Assessment
+            </a>
+
+            <button className="w-full sm:w-auto border border-[#cfd6e4] text-[#6c8ef5] px-5 sm:px-6 py-3 rounded-xl text-sm font-medium hover:bg-[#f3f6ff]">
+              Explore Our Program →
+            </button>
+          </div>
+
+          {/* Features */}
+          <div className="mt-5 sm:mt-6 flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-6 text-[13px] sm:text-sm text-[#6b7280] items-start md:items-start">
+            <span className="flex items-center gap-2">
+              <FaCheckCircle className="text-[#6c8ef5] text-xs" />
+              Clinically Guided
+            </span>
+            <span className="flex items-center gap-2">
+              <FaCheckCircle className="text-[#6c8ef5] text-xs" />
+              Personalized Plan
+            </span>
+            <span className="flex items-center gap-2">
+              <FaCheckCircle className="text-[#6c8ef5] text-xs" />
+              5000+ Families Helped
+            </span>
+          </div>
         </div>
 
-        {/* Heading */}
-        <h1 className="text-4xl md:text-5xl font-serif font-semibold text-gray-900 leading-tight">
-          A Structured Support System for <br />
-          Autism & ADHD
-        </h1>
+        {/* RIGHT */}
+        <div className="flex-1 flex justify-center w-full">
+          <div className="relative w-full max-w-[320px] sm:max-w-[420px] md:max-w-[550px] h-[220px] sm:h-[300px] md:h-[400px] rounded-[18px] sm:rounded-[24px] md:rounded-[28px] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.08)]">
 
-        {/* Subtitle */}
-        <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
-          Guided care for behavior, focus, learning, sleep, and development—built
-          around your child.
-        </p>
+            {/* IMAGE */}
+            <img
+              src={imghero}
+              alt="Hero"
+              className="w-full h-full object-cover"
+            />
 
-        {/* CTA Buttons */}
-        <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-          <button className="flex items-center justify-center gap-2 bg-green-700 text-white px-7 py-3 rounded-full font-medium hover:bg-green-800 transition">
-            <Calendar size={18} />
-            Book Consultation
-          </button>
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-black/20"></div>
 
-          <button className="flex items-center justify-center gap-2 border border-gray-300 px-7 py-3 rounded-full font-medium text-gray-800 hover:bg-gray-100 transition">
-            <MessageCircle size={18} />
-            WhatsApp Guidance
-          </button>
-        </div>
+            {/* Top Badge */}
+            <div className="absolute top-2 left-2 sm:left-4 bg-white rounded-lg sm:rounded-xl px-2.5 sm:px-3 py-1 shadow-md text-[9px] sm:text-xs text-gray-700">
+              <span className="text-[#6c8ef5] font-bold text-xs sm:text-sm">90%+</span><br />
+              Report Improvement
+            </div>
 
-        {/* Features */}
-        <div className="mt-12 bg-green-50 rounded-xl py-4 px-6 flex flex-wrap justify-center gap-8 text-sm text-green-900">
-          <div className="flex items-center gap-2">
-            <ShieldCheck size={16} />
-            Clinically Guided
-          </div>
-          <div className="flex items-center gap-2">
-            <User size={16} />
-            Personalized Plan
-          </div>
-          <div className="flex items-center gap-2">
-            <HeartHandshake size={16} />
-            Follow-up Support
+            {/* Bottom Badge */}
+            <div className="absolute bottom-2 right-2 sm:right-4 bg-[#ffe7a3] rounded-lg sm:rounded-xl px-2.5 sm:px-3 py-1 shadow-md text-[9px] sm:text-xs text-gray-800">
+              <span className="font-bold text-xs sm:text-sm">5000+</span><br />
+              Families Helped
+            </div>
+
           </div>
         </div>
 
       </div>
     </section>
   );
-};
-
-export default Hero;
+}

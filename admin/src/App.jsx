@@ -3,8 +3,14 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Layout from "./components/Layout";
-import AdminAddBlog from "./pages/AdminAddBlog";
 import TeenageBlog from "./pages/TeenageBlog";
+import AdultBlog from "./pages/AdultBlog";
+import AutismContactPanel from "./pages/AutismContactPanel";
+import AdminBlogDashboard from "./pages/AdminBlogDashboard";
+import AutismEditBlog from "./pages/AutismEditBlog";
+import AdminAddBlog from "./pages/AdminAddBlog";
+
+
 
 
 
@@ -16,10 +22,13 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
-         <Route path="/Admin-Blog" element={<Layout><AdminAddBlog/></Layout>} />
+         <Route path="/Admin/blogs" element={<Layout><AdminBlogDashboard/></Layout>} />
         <Route path="/Admin-Teenage" element={<Layout><TeenageBlog/></Layout>} />
-      
-          <Route path="*" element={<Navigate to="/" />} />
+        <Route path="/Admin-Adult" element={<Layout><AdultBlog/></Layout>} />
+         <Route path="/Admin-Autism" element={<Layout><AutismContactPanel/></Layout>} />
+           <Route path="/admin-addblog" element={<AdminAddBlog />} />
+           <Route path="/admin/edit-blog/:id" element={<AutismEditBlog/>} />
+    
         </Routes>
       </Router>
       {/* Move ToastContainer **outside Router** so it always exists */}

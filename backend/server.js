@@ -5,6 +5,8 @@
       dotenv.config();
       import blogRoutes from "./routes/blogRoutes.js";
       import teenageBlogRoutes from "./routes/teenageBlogRoutes.js";
+import adultBlogRoutes from "./routes/adultBlogRoutes.js";
+import autismRoutes from "./routes/autismContactRoutes.js";
 
 
       const app = express();
@@ -30,6 +32,10 @@
   
    app.use("/api/blogs", blogRoutes);
 app.use("/api", teenageBlogRoutes);
+app.use("/api/adult-blogs", adultBlogRoutes);
+app.use("/api/autism/contact", autismRoutes);
+
+
 
 
 
