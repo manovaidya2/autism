@@ -59,7 +59,7 @@ export default function AutismEditBlog() {
     } catch (error) {
       console.error("Error fetching blog:", error);
       alert("Failed to fetch blog data");
-      navigate("/admin/blogs");
+      navigate("/admin-blogs");
     } finally {
       setLoading(false);
     }
@@ -178,7 +178,7 @@ export default function AutismEditBlog() {
       
       if (response.data.success) {
         alert("Blog updated successfully!");
-        navigate("/admin/blogs");
+        navigate("/admin-blogs");
       } else {
         alert(response.data.message || "Failed to update blog");
       }
@@ -218,7 +218,7 @@ export default function AutismEditBlog() {
           <h1 className="text-3xl font-bold text-gray-800">Edit Blog</h1>
           <button
             type="button"
-            onClick={() => navigate("/admin/blogs")}
+            onClick={() => navigate("/admin-blogs")}
             className="text-gray-600 hover:text-gray-800 px-4 py-2 rounded-lg border border-gray-300"
           >
             Cancel
@@ -415,7 +415,7 @@ export default function AutismEditBlog() {
             </button>
             <button
               type="button"
-              onClick={() => navigate("/admin/blogs")}
+              onClick={() => navigate("/admin-blogs")}
               className="px-6 py-3 rounded-xl font-semibold border border-gray-300 hover:bg-gray-50"
             >
               Cancel

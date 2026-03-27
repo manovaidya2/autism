@@ -45,7 +45,7 @@ const Sidebar = () => {
       label: "Autism Care",
       iconColor: "text-pink-400",
       submenu: [
-        { label: "Blogs", path: "/Admin-Blog", icon: <FaClipboardList /> },
+        { label: "Blogs", path: "/Admin-blogs", icon: <FaClipboardList /> },
         { label: "Contact Us", path: "/Admin-Autism", icon: <MdPsychology /> },
         { label: "Therapies", path: "/admin-autism-therapies", icon: <FaHeartbeat /> },
       ],

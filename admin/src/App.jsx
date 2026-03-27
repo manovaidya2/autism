@@ -22,7 +22,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
-         <Route path="/Admin/blogs" element={<Layout><AdminBlogDashboard/></Layout>} />
+         <Route path="/Admin-blogs" element={<Layout><AdminBlogDashboard/></Layout>} />
         <Route path="/Admin-Teenage" element={<Layout><TeenageBlog/></Layout>} />
         <Route path="/Admin-Adult" element={<Layout><AdultBlog/></Layout>} />
          <Route path="/Admin-Autism" element={<Layout><AutismContactPanel/></Layout>} />
