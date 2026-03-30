@@ -13,7 +13,7 @@ export default function ResultsSection() {
   const cards = [
     {
       afterTitle: "After (4 months into program)",
-      video: "https://www.youtube.com/embed/oWMqqacIIpQ",
+      video: "https://www.youtube.com/embed/OQg0gMNgIdo",
       before: [
         "No speech at age 3 — only sounds",
         "Zero eye contact or name response",
@@ -28,13 +28,13 @@ export default function ResultsSection() {
       ],
       quote:
         "We were told our son would never speak...",
-      name: "Sneha & Amit Sharma",
+      name: "Sakshi Gupta",
       detail: "Son, Age 4 — Autism Spectrum",
       initial: "S",
     },
     {
       afterTitle: "After (6 months into program)",
-      video: "https://www.youtube.com/embed/rBOGwlYSfUY",
+      video: "https://www.youtube.com/embed/b0OzBNn9F_s",
       before: [
         "Constant meltdowns — 8–10 times daily",
         "No social interaction — completely isolated",
@@ -49,13 +49,13 @@ export default function ResultsSection() {
       ],
       quote:
         "The doctors told us this was permanent...",
-      name: "Priya Mehta",
-      detail: "Daughter, Age 5 — ASD + ADHD",
+      name: "Rachna Mehra",
+      detail: "Son, Age 5 — ASD + ADHD",
       initial: "P",
     },
     {
       afterTitle: "After (3 months into program)",
-      video: "https://www.youtube.com/embed/gYgPy11WNV8",
+      video: "https://www.youtube.com/embed/ZRsjg5Onbqo",
       before: [
         "Diagnosed ADHD at age 6 — couldn’t focus in school",
         "Disruptive behavior in class",
@@ -70,7 +70,7 @@ export default function ResultsSection() {
       ],
       quote:
         "Our son was labeled as the 'problem child'...",
-      name: "Rajesh & Kavita Patel",
+      name: "Ritina bansal",
       detail: "Son, Age 7 — ADHD Combined Type",
       initial: "R",
     },
@@ -78,7 +78,7 @@ export default function ResultsSection() {
     // 👇 ADD MORE CARDS HERE (optional)
     {
       afterTitle: "After (5 months into program)",
-      video: "https://www.youtube.com/embed/oWMqqacIIpQ",
+      video: "https://www.youtube.com/embed/80fFVYSS_gA",
       before: [
         "No verbal communication",
         "Extreme anxiety in social situations",
