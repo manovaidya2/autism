@@ -4,8 +4,8 @@ import { FaUser, FaLock, FaEye, FaEyeSlash, FaSignInAlt, FaBrain, FaHeart, FaChi
 import { MdEmail, MdOutlineHealthAndSafety } from "react-icons/md";
 
 const users = [
-  { email: "manovaidya", password: "manovaidya@123", role: "admin", name: "Manovaidya" },
-  { email: "abhi", password: "123", role: "user", name: "Abhishek" },
+  { email: "manovaidya@123", password: "manovaidya@123", role: "admin", name: "Manovaidya" },
+  { email: "abhi@123", password: "123", role: "user", name: "Abhishek" },
   { email: "admin@example.com", password: "123456", role: "admin", name: "System Admin" },
 ];
 
