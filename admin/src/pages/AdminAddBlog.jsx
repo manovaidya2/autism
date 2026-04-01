@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import axiosInstance from "../api/axiosInstance";
 
-export default function BlogAdmin() {
+export default function AdminAddBlog() {
   const editorRef = useRef(null);
   const editorFileRef = useRef(null);
   
@@ -10,6 +10,12 @@ export default function BlogAdmin() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [posts, setPosts] = useState([]);
+  
+  // FAQ States
+  const [faqs, setFaqs] = useState([]);
+  const [faqQuestion, setFaqQuestion] = useState("");
+  const [faqAnswer, setFaqAnswer] = useState("");
+  const [editingFaqIndex, setEditingFaqIndex] = useState(null);
   
   const [formData, setFormData] = useState({
     title: "",
@@ -33,8 +39,12 @@ export default function BlogAdmin() {
     try {
       // Try to fetch from API first
       const response = await axiosInstance.get("/blogs");
-      if (response.data && response.data.success) {
+      if (Array.isArray(response.data)) {
+        setPosts(response.data);
+      } else if (response.data && response.data.success) {
         setPosts(response.data.data || []);
+      } else {
+        setPosts([]);
       }
     } catch (error) {
       // Fallback to localStorage
@@ -42,31 +52,7 @@ export default function BlogAdmin() {
       if (storedPosts) {
         setPosts(JSON.parse(storedPosts));
       } else {
-        // Sample data
-        const samplePosts = [
-          {
-            id: 1,
-            title: "How to Get Full Scholarship in USA",
-            shortDescription: "Complete guide to securing fully-funded scholarships at top American universities.",
-            category: "Scholarships",
-            authorName: "Priya Sharma",
-            date: "Mar 10, 2026",
-            views: "1.8k",
-            tags: ["Scholarship", "USA", "Financial Aid"]
-          },
-          {
-            id: 2,
-            title: "Top 10 Universities in Canada for 2026",
-            shortDescription: "Discover the best Canadian universities for international students.",
-            category: "Study Abroad",
-            authorName: "Michael Chen",
-            date: "Mar 8, 2026",
-            views: "2.3k",
-            tags: ["Canada", "Universities", "Study Abroad"]
-          }
-        ];
-        setPosts(samplePosts);
-        localStorage.setItem("blog_posts_admin", JSON.stringify(samplePosts));
+        setPosts([]);
       }
     }
   };
@@ -111,7 +97,65 @@ export default function BlogAdmin() {
     });
   };
 
-  // RICH TEXT EDITOR FUNCTIONS (same as AdminAddBlog)
+  // FAQ MANAGEMENT
+  const handleAddFaq = () => {
+    if (!faqQuestion.trim()) {
+      alert("Please enter a question");
+      return;
+    }
+    if (!faqAnswer.trim()) {
+      alert("Please enter an answer");
+      return;
+    }
+
+    if (editingFaqIndex !== null) {
+      // Update existing FAQ
+      const updatedFaqs = [...faqs];
+      updatedFaqs[editingFaqIndex] = {
+        question: faqQuestion,
+        answer: faqAnswer
+      };
+      setFaqs(updatedFaqs);
+      setEditingFaqIndex(null);
+      setMessage("✅ FAQ updated successfully!");
+    } else {
+      // Add new FAQ
+      setFaqs([...faqs, {
+        question: faqQuestion,
+        answer: faqAnswer
+      }]);
+      setMessage("✅ FAQ added successfully!");
+    }
+    
+    // Reset form
+    setFaqQuestion("");
+    setFaqAnswer("");
+    
+    // Clear message after 3 seconds
+    setTimeout(() => setMessage(""), 3000);
+  };
+
+  const handleEditFaq = (index) => {
+    setFaqQuestion(faqs[index].question);
+    setFaqAnswer(faqs[index].answer);
+    setEditingFaqIndex(index);
+  };
+
+  const handleDeleteFaq = (index) => {
+    if (window.confirm("Are you sure you want to delete this FAQ?")) {
+      const updatedFaqs = faqs.filter((_, i) => i !== index);
+      setFaqs(updatedFaqs);
+      if (editingFaqIndex === index) {
+        setEditingFaqIndex(null);
+        setFaqQuestion("");
+        setFaqAnswer("");
+      }
+      setMessage("✅ FAQ deleted successfully!");
+      setTimeout(() => setMessage(""), 3000);
+    }
+  };
+
+  // RICH TEXT EDITOR FUNCTIONS
   const formatText = (command, value = null) => {
     document.execCommand(command, false, value);
     editorRef.current.focus();
@@ -141,7 +185,7 @@ export default function BlogAdmin() {
 
   // Edit existing post
   const handleEditPost = (post) => {
-    setEditingId(post.id);
+    setEditingId(post._id || post.id);
     setFormData({
       title: post.title || "",
       slug: post.slug || "",
@@ -149,11 +193,14 @@ export default function BlogAdmin() {
       date: post.date || "",
       image: post.image || "",
       shortDescription: post.shortDescription || "",
-      authorName: post.authorName || "",
+      authorName: post.author || post.authorName || "",
       views: post.views || "",
       tags: post.tags || [],
       content: post.content || ""
     });
+    
+    // Load FAQs
+    setFaqs(post.faqs || []);
     
     if (editorRef.current) {
       editorRef.current.innerHTML = post.content || "";
@@ -166,12 +213,12 @@ export default function BlogAdmin() {
   const handleDeletePost = async (id) => {
     if (window.confirm("Are you sure you want to delete this post?")) {
       try {
-        await axiosInstance.delete(`/blogs/${id}`);
-        setPosts(posts.filter(post => post.id !== id));
+        await axiosInstance.delete(`/blogs/admin/${id}`);
+        setPosts(posts.filter(post => (post._id || post.id) !== id));
         setMessage("✅ Post deleted successfully");
       } catch (error) {
         // Local delete
-        const updatedPosts = posts.filter(post => post.id !== id);
+        const updatedPosts = posts.filter(post => (post._id || post.id) !== id);
         setPosts(updatedPosts);
         localStorage.setItem("blog_posts_admin", JSON.stringify(updatedPosts));
         setMessage("✅ Post deleted successfully");
@@ -194,6 +241,10 @@ export default function BlogAdmin() {
       content: ""
     });
     setTagInput("");
+    setFaqs([]);
+    setFaqQuestion("");
+    setFaqAnswer("");
+    setEditingFaqIndex(null);
     setEditingId(null);
     if (editorRef.current) {
       editorRef.current.innerHTML = "";
@@ -219,44 +270,66 @@ export default function BlogAdmin() {
     setIsSubmitting(true);
 
     const blogData = {
-      ...formData,
+      title: formData.title,
+      slug: formData.slug,
+      author: formData.authorName,
+      category: formData.category,
+      date: formData.date,
+      image: formData.image,
+      shortDescription: formData.shortDescription,
       content: htmlContent,
-      id: editingId || Date.now()
+      tags: formData.tags,
+      views: formData.views,
+      faqs: faqs.map(faq => ({
+        question: faq.question,
+        answer: faq.answer
+      }))
     };
 
     try {
       if (editingId) {
         // Update existing post
-        await axiosInstance.put(`/blogs/${editingId}`, blogData);
-        setPosts(posts.map(post => post.id === editingId ? blogData : post));
-        setMessage("✅ Blog updated successfully!");
+        const response = await axiosInstance.put(`/blogs/admin/${editingId}`, blogData);
+        if (response.data && response.data.success) {
+          await loadPosts();
+          setMessage("✅ Blog updated successfully!");
+        } else {
+          throw new Error("Update failed");
+        }
       } else {
         // Create new post
         const response = await axiosInstance.post("/blogs", blogData);
         if (response.data && response.data.success) {
-          setPosts([blogData, ...posts]);
+          await loadPosts();
           setMessage("✅ Blog published successfully!");
         } else {
-          // Fallback to localStorage
-          setPosts([blogData, ...posts]);
-          localStorage.setItem("blog_posts_admin", JSON.stringify([blogData, ...posts]));
-          setMessage("✅ Blog saved locally!");
+          throw new Error("Create failed");
         }
       }
 
       resetForm();
     } catch (error) {
       console.error("Error:", error);
+      
       // Fallback to localStorage
+      const newPost = {
+        ...blogData,
+        _id: editingId || Date.now(),
+        id: editingId || Date.now(),
+        createdAt: new Date()
+      };
+      
+      let updatedPosts;
       if (editingId) {
-        setPosts(posts.map(post => post.id === editingId ? blogData : post));
+        updatedPosts = posts.map(post => (post._id || post.id) === editingId ? newPost : post);
       } else {
-        setPosts([blogData, ...posts]);
+        updatedPosts = [newPost, ...posts];
       }
-      localStorage.setItem("blog_posts_admin", JSON.stringify(
-        editingId ? posts.map(post => post.id === editingId ? blogData : post) : [blogData, ...posts]
-      ));
+      
+      setPosts(updatedPosts);
+      localStorage.setItem("blog_posts_admin", JSON.stringify(updatedPosts));
       setMessage(`✅ Blog ${editingId ? "updated" : "saved"} locally!`);
+      resetForm();
     } finally {
       setIsSubmitting(false);
     }
@@ -435,6 +508,93 @@ export default function BlogAdmin() {
               </div>
             </div>
 
+            {/* FAQ SECTION */}
+            <div className="border-t border-gray-200 pt-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-3">
+                <i className="fas fa-question-circle text-blue-600 mr-2"></i>
+                Frequently Asked Questions (FAQs)
+              </label>
+              
+              {/* Add/Edit FAQ Form */}
+              <div className="bg-gray-50 rounded-xl p-4 mb-4">
+                <div className="mb-3">
+                  <input
+                    type="text"
+                    value={faqQuestion}
+                    onChange={(e) => setFaqQuestion(e.target.value)}
+                    placeholder="Question"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  />
+                </div>
+                <div className="mb-3">
+                  <textarea
+                    value={faqAnswer}
+                    onChange={(e) => setFaqAnswer(e.target.value)}
+                    placeholder="Answer"
+                    rows="2"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddFaq}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition"
+                >
+                  {editingFaqIndex !== null ? "Update FAQ" : "Add FAQ"}
+                </button>
+                {editingFaqIndex !== null && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingFaqIndex(null);
+                      setFaqQuestion("");
+                      setFaqAnswer("");
+                    }}
+                    className="ml-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition"
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
+
+              {/* FAQ List */}
+              {faqs.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-semibold text-gray-700">Added FAQs ({faqs.length})</h4>
+                  {faqs.map((faq, index) => (
+                    <div key={index} className="border border-gray-200 rounded-lg p-3 bg-white">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-800 text-sm">
+                            <span className="text-blue-600">Q:</span> {faq.question}
+                          </p>
+                          <p className="text-gray-600 text-sm mt-1">
+                            <span className="text-green-600">A:</span> {faq.answer}
+                          </p>
+                        </div>
+                        <div className="flex gap-2 ml-4">
+                          <button
+                            type="button"
+                            onClick={() => handleEditFaq(index)}
+                            className="text-blue-600 hover:text-blue-800 text-sm"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteFaq(index)}
+                            className="text-red-600 hover:text-red-800 text-sm"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* RICH TEXT EDITOR TOOLBAR */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Blog Content *</label>
@@ -494,58 +654,6 @@ export default function BlogAdmin() {
               </button>
             </div>
           </form>
-        </div>
-
-        {/* Existing Posts Section - Moved below form */}
-        <div className="mt-8 bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
-          <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <i className="fas fa-database text-blue-600"></i>
-            Existing Posts ({posts.length})
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {posts.length === 0 ? (
-              <p className="text-gray-500 text-center py-8 col-span-full">No posts yet. Create your first blog!</p>
-            ) : (
-              posts.map((post) => (
-                <div
-                  key={post.id}
-                  className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition group"
-                >
-                  <h4 className="font-semibold text-gray-800 line-clamp-2 text-base mb-2">{post.title}</h4>
-                  <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                    <span className="flex items-center gap-1"><i className="fas fa-user"></i> {post.authorName || "Unknown"}</span>
-                    <span className="flex items-center gap-1"><i className="fas fa-eye"></i> {post.views || "0"}</span>
-                  </div>
-                  {post.category && (
-                    <div className="mt-2">
-                      <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full">📁 {post.category}</span>
-                    </div>
-                  )}
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {post.tags?.slice(0, 2).map((tag, i) => (
-                      <span key={i} className="text-[10px] bg-gray-100 px-2 py-0.5 rounded-full">#{tag}</span>
-                    ))}
-                    {post.tags?.length > 2 && <span className="text-[10px] text-gray-400">+{post.tags.length - 2}</span>}
-                  </div>
-                  <div className="flex gap-2 mt-3">
-                    <button
-                      onClick={() => handleEditPost(post)}
-                      className="flex-1 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 py-1.5 rounded-lg flex items-center justify-center gap-1"
-                    >
-                      <i className="fas fa-edit"></i> Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeletePost(post.id)}
-                      className="flex-1 text-xs bg-red-50 hover:bg-red-100 text-red-600 py-1.5 rounded-lg flex items-center justify-center gap-1"
-                    >
-                      <i className="fas fa-trash-alt"></i> Delete
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
         </div>
       </div>
 
