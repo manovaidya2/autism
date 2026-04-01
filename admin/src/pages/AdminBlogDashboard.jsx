@@ -13,6 +13,7 @@ export default function AdminBlogDashboard() {
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(null); // Track which blog is being deleted
 
   // Fetch all blogs
   const fetchBlogs = async () => {
@@ -57,7 +58,7 @@ export default function AdminBlogDashboard() {
     const authorsList = Array.from(authorsMap.entries()).map(([name, count]) => ({
       name,
       count,
-    }));
+    })).sort((a, b) => b.count - a.count); // Sort by post count
 
     setStats({
       total: blogsData.length,
@@ -67,16 +68,49 @@ export default function AdminBlogDashboard() {
     });
   };
 
-  // Delete blog
+  // Delete blog with proper error handling
   const handleDelete = async (blogId, blogTitle) => {
-    if (window.confirm(`Are you sure you want to delete "${blogTitle}"?`)) {
+    if (window.confirm(`Are you sure you want to delete "${blogTitle}"? This action cannot be undone.`)) {
+      setDeleteLoading(blogId);
       try {
-        await axiosInstance.delete(`/blogs/${blogId}`);
-        alert("Blog deleted successfully!");
-        fetchBlogs(); // Refresh the list
+        // Use the correct endpoint with /admin/ prefix
+        const response = await axiosInstance.delete(`/blogs/admin/${blogId}`);
+        
+        if (response.data && response.data.success) {
+          alert("✅ Blog deleted successfully!");
+          // Refresh the blog list
+          await fetchBlogs();
+        } else {
+          throw new Error(response.data.message || "Delete failed");
+        }
       } catch (error) {
         console.error("Error deleting blog:", error);
-        alert("Failed to delete blog");
+        
+        // More detailed error message
+        let errorMessage = "Failed to delete blog";
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          if (error.response.status === 404) {
+            errorMessage = "Blog not found. It may have been already deleted.";
+          } else if (error.response.status === 401) {
+            errorMessage = "Unauthorized. Please check your authentication.";
+          } else if (error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          } else {
+            errorMessage = `Server error: ${error.response.status}`;
+          }
+        } else if (error.request) {
+          // The request was made but no response was received
+          errorMessage = "Network error. Please check your connection.";
+        } else {
+          // Something happened in setting up the request
+          errorMessage = error.message;
+        }
+        
+        alert(`❌ ${errorMessage}`);
+      } finally {
+        setDeleteLoading(null);
       }
     }
   };
@@ -120,7 +154,7 @@ export default function AdminBlogDashboard() {
 
   return (
     <section className="p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Blog Management Dashboard</h1>
@@ -326,9 +360,22 @@ export default function AdminBlogDashboard() {
                           </Link>
                           <button
                             onClick={() => handleDelete(blog._id, blog.title)}
-                            className="text-red-600 hover:text-red-900 font-medium text-sm"
+                            disabled={deleteLoading === blog._id}
+                            className={`text-red-600 hover:text-red-900 font-medium text-sm flex items-center gap-1 ${
+                              deleteLoading === blog._id ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
                           >
-                            Delete
+                            {deleteLoading === blog._id ? (
+                              <>
+                                <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Deleting...
+                              </>
+                            ) : (
+                              "Delete"
+                            )}
                           </button>
                         </div>
                       </td>

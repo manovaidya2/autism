@@ -10,7 +10,6 @@ export default function BlogAdmin() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [posts, setPosts] = useState([]);
-  const [showPostsList, setShowPostsList] = useState(true);
   
   const [formData, setFormData] = useState({
     title: "",
@@ -160,7 +159,6 @@ export default function BlogAdmin() {
       editorRef.current.innerHTML = post.content || "";
     }
     
-    setShowPostsList(false);
     setMessage("");
   };
 
@@ -247,7 +245,6 @@ export default function BlogAdmin() {
       }
 
       resetForm();
-      setShowPostsList(true);
     } catch (error) {
       console.error("Error:", error);
       // Fallback to localStorage
@@ -267,7 +264,7 @@ export default function BlogAdmin() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 py-8 px-4">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
@@ -276,16 +273,10 @@ export default function BlogAdmin() {
           </h1>
           <div className="flex gap-3">
             <button
-              onClick={() => { resetForm(); setShowPostsList(false); setEditingId(null); }}
+              onClick={() => { resetForm(); setEditingId(null); }}
               className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl transition flex items-center gap-2"
             >
               <i className="fas fa-plus"></i> New Post
-            </button>
-            <button
-              onClick={() => setShowPostsList(!showPostsList)}
-              className="bg-gray-600 hover:bg-gray-700 text-white px-5 py-2 rounded-xl transition flex items-center gap-2"
-            >
-              <i className="fas fa-list"></i> {showPostsList ? "Hide List" : "Show List"}
             </button>
           </div>
         </div>
@@ -296,273 +287,265 @@ export default function BlogAdmin() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* MAIN FORM - Same style as AdminAddBlog */}
-          <div className={`${showPostsList ? "lg:col-span-2" : "lg:col-span-3"} transition-all`}>
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
-              <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                <i className="fas fa-pen-fancy text-blue-600"></i>
-                {editingId ? "Edit Blog Post" : "Create New Blog Post"}
-              </h2>
+        {/* MAIN FORM */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
+          <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
+            <i className="fas fa-pen-fancy text-blue-600"></i>
+            {editingId ? "Edit Blog Post" : "Create New Blog Post"}
+          </h2>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Title with auto slug */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Title *</label>
-                    <input
-                      type="text"
-                      name="title"
-                      value={formData.title}
-                      onChange={handleChange}
-                      placeholder="Enter blog title"
-                      className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Slug (URL)</label>
-                    <input
-                      type="text"
-                      name="slug"
-                      value={formData.slug}
-                      onChange={handleChange}
-                      placeholder="auto-generated"
-                      className="w-full border border-gray-300 rounded-xl px-4 py-2.5 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                  </div>
-                </div>
-
-                {/* Author, Category, Date, Views */}
-                <div className="grid md:grid-cols-4 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Author Name *</label>
-                    <input
-                      type="text"
-                      name="authorName"
-                      value={formData.authorName}
-                      onChange={handleChange}
-                      placeholder="Author name"
-                      className="w-full border border-gray-300 rounded-xl px-4 py-2.5"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Category</label>
-                    <select
-                      name="category"
-                      value={formData.category}
-                      onChange={handleChange}
-                      className="w-full border border-gray-300 rounded-xl px-4 py-2.5"
-                    >
-                      <option value="">Select Category</option>
-                      <option>Scholarships</option>
-                      <option>Study Abroad</option>
-                      <option>Visa Guide</option>
-                      <option>Career Advice</option>
-                      <option>University Tips</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Date</label>
-                    <input
-                      type="text"
-                      name="date"
-                      value={formData.date}
-                      onChange={handleChange}
-                      placeholder="Mar 15, 2026"
-                      className="w-full border border-gray-300 rounded-xl px-4 py-2.5"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Views</label>
-                    <input
-                      type="text"
-                      name="views"
-                      value={formData.views}
-                      onChange={handleChange}
-                      placeholder="e.g., 1.2k"
-                      className="w-full border border-gray-300 rounded-xl px-4 py-2.5"
-                    />
-                  </div>
-                </div>
-
-                {/* Short Description */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Short Description</label>
-                  <textarea
-                    name="shortDescription"
-                    value={formData.shortDescription}
-                    onChange={handleChange}
-                    rows="2"
-                    placeholder="Brief summary of the blog post..."
-                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 resize-none"
-                  />
-                </div>
-
-                {/* Main Image Upload */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Featured Image</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleMainImageUpload}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-2"
-                  />
-                  {formData.image && (
-                    <img src={formData.image} alt="Preview" className="mt-2 w-32 h-32 object-cover rounded-lg border" />
-                  )}
-                </div>
-
-                {/* TAGS EDITOR */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Tags</label>
-                  <div className="flex gap-2 mb-2">
-                    <input
-                      type="text"
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyPress={handleTagKeyPress}
-                      placeholder="Add a tag and press Enter"
-                      className="flex-1 border border-gray-300 rounded-xl px-4 py-2"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddTag}
-                      className="bg-gray-200 hover:bg-gray-300 px-4 rounded-xl transition"
-                    >
-                      Add
-                    </button>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {formData.tags.map((tag, idx) => (
-                      <span key={idx} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                        #{tag}
-                        <button
-                          type="button"
-                          onClick={() => removeTag(tag)}
-                          className="hover:text-red-600 ml-1"
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* RICH TEXT EDITOR TOOLBAR - Same as AdminAddBlog */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Blog Content *</label>
-                  <div className="flex flex-wrap gap-2 border rounded-xl p-3 bg-gray-50 mb-2">
-                    <button type="button" onClick={() => formatText("bold")} className="editor-btn"><b>B</b></button>
-                    <button type="button" onClick={() => formatText("italic")} className="editor-btn"><i>I</i></button>
-                    <button type="button" onClick={() => formatText("underline")} className="editor-btn"><u>U</u></button>
-                    <button type="button" onClick={() => formatText("strikeThrough")} className="editor-btn"><s>S</s></button>
-                    <div className="w-px h-8 bg-gray-300 mx-1"></div>
-                    <button type="button" onClick={() => formatText("insertUnorderedList")} className="editor-btn">• List</button>
-                    <button type="button" onClick={() => formatText("insertOrderedList")} className="editor-btn">1. List</button>
-                    <div className="w-px h-8 bg-gray-300 mx-1"></div>
-                    <select onChange={(e) => formatText("formatBlock", e.target.value)} className="editor-select">
-                      <option value="">Heading</option>
-                      <option value="h1">H1</option>
-                      <option value="h2">H2</option>
-                      <option value="h3">H3</option>
-                      <option value="p">Paragraph</option>
-                    </select>
-                    <input type="color" title="Text Color" onChange={(e) => formatText("foreColor", e.target.value)} className="w-8 h-8 rounded border cursor-pointer" />
-                    <div className="w-px h-8 bg-gray-300 mx-1"></div>
-                    <button type="button" onClick={() => { const url = prompt("Enter link URL"); if(url) formatText("createLink", url); }} className="editor-btn">🔗 Link</button>
-                    <button type="button" onClick={() => editorFileRef.current.click()} className="editor-btn">🖼️ Image</button>
-                    <input type="file" accept="image/*" ref={editorFileRef} onChange={handleEditorImageUpload} className="hidden" />
-                    <button type="button" onClick={() => formatText("undo")} className="editor-btn">↩️ Undo</button>
-                    <button type="button" onClick={() => formatText("redo")} className="editor-btn">↪️ Redo</button>
-                  </div>
-
-                  {/* Rich Text Editor Area */}
-                  <div
-                    ref={editorRef}
-                    contentEditable
-                    className="min-h-[350px] border border-gray-300 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
-                    suppressContentEditableWarning={true}
-                    style={{ whiteSpace: "pre-wrap" }}
-                  />
-                </div>
-
-                {/* Form Buttons */}
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className={`flex-1 bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2 ${
-                      isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                  >
-                    <i className="fas fa-save"></i>
-                    {isSubmitting ? "Saving..." : editingId ? "Update Blog" : "Publish Blog"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    className="px-6 py-3 border border-gray-300 rounded-xl font-semibold hover:bg-gray-50 transition"
-                  >
-                    Clear
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-
-          {/* POSTS LIST SIDEBAR */}
-          {showPostsList && (
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-5 sticky top-6">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <i className="fas fa-database text-blue-600"></i>
-                  Existing Posts ({posts.length})
-                </h3>
-                
-                <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1">
-                  {posts.length === 0 ? (
-                    <p className="text-gray-500 text-center py-8">No posts yet. Create your first blog!</p>
-                  ) : (
-                    posts.map((post) => (
-                      <div
-                        key={post.id}
-                        className="border border-gray-200 rounded-xl p-3 hover:shadow-md transition group"
-                      >
-                        <h4 className="font-semibold text-gray-800 line-clamp-2 text-sm">{post.title}</h4>
-                        <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                          <span className="flex items-center gap-1"><i className="fas fa-user"></i> {post.authorName || "Unknown"}</span>
-                          <span className="flex items-center gap-1"><i className="fas fa-eye"></i> {post.views || "0"}</span>
-                        </div>
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {post.tags?.slice(0, 2).map((tag, i) => (
-                            <span key={i} className="text-[10px] bg-gray-100 px-2 py-0.5 rounded-full">#{tag}</span>
-                          ))}
-                          {post.tags?.length > 2 && <span className="text-[10px] text-gray-400">+{post.tags.length - 2}</span>}
-                        </div>
-                        <div className="flex gap-2 mt-3">
-                          <button
-                            onClick={() => handleEditPost(post)}
-                            className="flex-1 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 py-1.5 rounded-lg flex items-center justify-center gap-1"
-                          >
-                            <i className="fas fa-edit"></i> Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeletePost(post.id)}
-                            className="flex-1 text-xs bg-red-50 hover:bg-red-100 text-red-600 py-1.5 rounded-lg flex items-center justify-center gap-1"
-                          >
-                            <i className="fas fa-trash-alt"></i> Delete
-                          </button>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Title with auto slug */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Title *</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder="Enter blog title"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Slug (URL)</label>
+                <input
+                  type="text"
+                  name="slug"
+                  value={formData.slug}
+                  onChange={handleChange}
+                  placeholder="auto-generated"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
               </div>
             </div>
-          )}
+
+            {/* Author, Category, Date, Views */}
+            <div className="grid md:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Author Name *</label>
+                <input
+                  type="text"
+                  name="authorName"
+                  value={formData.authorName}
+                  onChange={handleChange}
+                  placeholder="Author name"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Category *</label>
+                <input
+                  type="text"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  placeholder="Enter category (e.g., Scholarships, Study Abroad)"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Date</label>
+                <input
+                  type="text"
+                  name="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                  placeholder="Mar 15, 2026"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Views</label>
+                <input
+                  type="text"
+                  name="views"
+                  value={formData.views}
+                  onChange={handleChange}
+                  placeholder="e.g., 1.2k"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5"
+                />
+              </div>
+            </div>
+
+            {/* Short Description */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Short Description</label>
+              <textarea
+                name="shortDescription"
+                value={formData.shortDescription}
+                onChange={handleChange}
+                rows="2"
+                placeholder="Brief summary of the blog post..."
+                className="w-full border border-gray-300 rounded-xl px-4 py-2.5 resize-none"
+              />
+            </div>
+
+            {/* Main Image Upload */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Featured Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleMainImageUpload}
+                className="w-full border border-gray-300 rounded-xl px-4 py-2"
+              />
+              {formData.image && (
+                <img src={formData.image} alt="Preview" className="mt-2 w-32 h-32 object-cover rounded-lg border" />
+              )}
+            </div>
+
+            {/* TAGS EDITOR */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Tags</label>
+              <div className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyPress={handleTagKeyPress}
+                  placeholder="Add a tag and press Enter"
+                  className="flex-1 border border-gray-300 rounded-xl px-4 py-2"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddTag}
+                  className="bg-gray-200 hover:bg-gray-300 px-4 rounded-xl transition"
+                >
+                  Add
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {formData.tags.map((tag, idx) => (
+                  <span key={idx} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-1">
+                    #{tag}
+                    <button
+                      type="button"
+                      onClick={() => removeTag(tag)}
+                      className="hover:text-red-600 ml-1"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* RICH TEXT EDITOR TOOLBAR */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Blog Content *</label>
+              <div className="flex flex-wrap gap-2 border rounded-xl p-3 bg-gray-50 mb-2">
+                <button type="button" onClick={() => formatText("bold")} className="editor-btn"><b>B</b></button>
+                <button type="button" onClick={() => formatText("italic")} className="editor-btn"><i>I</i></button>
+                <button type="button" onClick={() => formatText("underline")} className="editor-btn"><u>U</u></button>
+                <button type="button" onClick={() => formatText("strikeThrough")} className="editor-btn"><s>S</s></button>
+                <div className="w-px h-8 bg-gray-300 mx-1"></div>
+                <button type="button" onClick={() => formatText("insertUnorderedList")} className="editor-btn">• List</button>
+                <button type="button" onClick={() => formatText("insertOrderedList")} className="editor-btn">1. List</button>
+                <div className="w-px h-8 bg-gray-300 mx-1"></div>
+                <select onChange={(e) => formatText("formatBlock", e.target.value)} className="editor-select">
+                  <option value="">Heading</option>
+                  <option value="h1">H1</option>
+                  <option value="h2">H2</option>
+                  <option value="h3">H3</option>
+                  <option value="p">Paragraph</option>
+                </select>
+                <input type="color" title="Text Color" onChange={(e) => formatText("foreColor", e.target.value)} className="w-8 h-8 rounded border cursor-pointer" />
+                <div className="w-px h-8 bg-gray-300 mx-1"></div>
+                <button type="button" onClick={() => { const url = prompt("Enter link URL"); if(url) formatText("createLink", url); }} className="editor-btn">🔗 Link</button>
+                <button type="button" onClick={() => editorFileRef.current.click()} className="editor-btn">🖼️ Image</button>
+                <input type="file" accept="image/*" ref={editorFileRef} onChange={handleEditorImageUpload} className="hidden" />
+                <button type="button" onClick={() => formatText("undo")} className="editor-btn">↩️ Undo</button>
+                <button type="button" onClick={() => formatText("redo")} className="editor-btn">↪️ Redo</button>
+              </div>
+
+              {/* Rich Text Editor Area */}
+              <div
+                ref={editorRef}
+                contentEditable
+                className="min-h-[350px] border border-gray-300 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
+                suppressContentEditableWarning={true}
+                style={{ whiteSpace: "pre-wrap" }}
+              />
+            </div>
+
+            {/* Form Buttons */}
+            <div className="flex gap-3 pt-4">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`flex-1 bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2 ${
+                  isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                <i className="fas fa-save"></i>
+                {isSubmitting ? "Saving..." : editingId ? "Update Blog" : "Publish Blog"}
+              </button>
+              <button
+                type="button"
+                onClick={resetForm}
+                className="px-6 py-3 border border-gray-300 rounded-xl font-semibold hover:bg-gray-50 transition"
+              >
+                Clear
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Existing Posts Section - Moved below form */}
+        <div className="mt-8 bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
+          <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <i className="fas fa-database text-blue-600"></i>
+            Existing Posts ({posts.length})
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {posts.length === 0 ? (
+              <p className="text-gray-500 text-center py-8 col-span-full">No posts yet. Create your first blog!</p>
+            ) : (
+              posts.map((post) => (
+                <div
+                  key={post.id}
+                  className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition group"
+                >
+                  <h4 className="font-semibold text-gray-800 line-clamp-2 text-base mb-2">{post.title}</h4>
+                  <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                    <span className="flex items-center gap-1"><i className="fas fa-user"></i> {post.authorName || "Unknown"}</span>
+                    <span className="flex items-center gap-1"><i className="fas fa-eye"></i> {post.views || "0"}</span>
+                  </div>
+                  {post.category && (
+                    <div className="mt-2">
+                      <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full">📁 {post.category}</span>
+                    </div>
+                  )}
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {post.tags?.slice(0, 2).map((tag, i) => (
+                      <span key={i} className="text-[10px] bg-gray-100 px-2 py-0.5 rounded-full">#{tag}</span>
+                    ))}
+                    {post.tags?.length > 2 && <span className="text-[10px] text-gray-400">+{post.tags.length - 2}</span>}
+                  </div>
+                  <div className="flex gap-2 mt-3">
+                    <button
+                      onClick={() => handleEditPost(post)}
+                      className="flex-1 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 py-1.5 rounded-lg flex items-center justify-center gap-1"
+                    >
+                      <i className="fas fa-edit"></i> Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeletePost(post.id)}
+                      className="flex-1 text-xs bg-red-50 hover:bg-red-100 text-red-600 py-1.5 rounded-lg flex items-center justify-center gap-1"
+                    >
+                      <i className="fas fa-trash-alt"></i> Delete
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 
