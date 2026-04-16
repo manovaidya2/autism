@@ -4,6 +4,7 @@ import axiosInstance from "../api/axiosInstance";
 import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
+import { User, Mail, Phone, MapPin, FileText, Send, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function BlogPage() {
   const [blogs, setBlogs] = useState([]);
@@ -11,6 +12,19 @@ export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    address: "",
+    message: "",
+  });
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -33,6 +47,95 @@ export default function BlogPage() {
 
     fetchBlogs();
   }, []);
+
+  // Validate form
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email is invalid";
+
+    if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
+    else if (!/^[\d\s\+\(\)\-]{8,}$/.test(formData.phone)) newErrors.phone = "Valid phone number required";
+
+    if (!formData.address.trim()) newErrors.address = "Address is required";
+    if (!formData.message.trim()) newErrors.message = "Message is required";
+
+    return newErrors;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
+
+    if (submitError) setSubmitError("");
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const newErrors = validateForm();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError("");
+
+    try {
+      const response = await axiosInstance.post("/autism/contact/create", formData);
+
+      if (response.data.success || response.status === 200 || response.status === 201) {
+        setIsSubmitted(true);
+        
+        // Store form data in localStorage for payment page if needed
+        localStorage.setItem("blogFormData", JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          message: formData.message
+        }));
+        
+        setFormData({
+          fullName: "",
+          email: "",
+          phone: "",
+          address: "",
+          message: "",
+        });
+
+        // Redirect to payment link after successful submission
+        setTimeout(() => {
+          window.location.href = "https://rzp.io/rzp/FjMRvHOy";
+        }, 1500);
+      } else {
+        setSubmitError(response.data.message || "Failed to submit form.");
+      }
+    } catch (err) {
+      if (err.response) {
+        setSubmitError(err.response.data.message || "Server error. Please try again.");
+      } else if (err.request) {
+        setSubmitError("No response from server. Please check your connection.");
+      } else {
+        setSubmitError("Something went wrong. Please try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Filter by category
   const filteredBlogs =
@@ -58,7 +161,7 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-[#f8f9fc]">
-      {/* Hero Section with Background Image */}
+      {/* Hero Section with Background Image and Form */}
       <section className="relative mb-8 overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
@@ -73,37 +176,192 @@ export default function BlogPage() {
         {/* Content */}
         <div className="relative z-20 px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-14">
           <div className="max-w-7xl mx-auto">
-            <div className="max-w-3xl mx-auto text-center">
-              {/* Small Label */}
-              <div className="inline-block px-3 py-1 text-xs font-medium text-blue-600 bg-white/90 backdrop-blur-sm rounded-full mb-3 shadow-sm">
-                Resources & Articles
+            <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
+              
+              {/* Left Side - Text Content */}
+              <div className="flex-1">
+                <div className="max-w-2xl">
+                  {/* Small Label */}
+                  <div className="inline-block px-3 py-1 text-xs font-medium text-blue-600 bg-white/90 backdrop-blur-sm rounded-full mb-3 shadow-sm">
+                    Resources & Articles
+                  </div>
+
+                  {/* Heading */}
+                  <h1 className="text-3xl sm:text-3xl lg:text-5xl font-bold text-white mb-3 leading-tight">
+                    Insights to Support
+                    <span className="block text-blue-200">
+                      Autism & Child Development
+                    </span>
+                  </h1>
+
+                  {/* Subtext */}
+                  <p className="text-sm sm:text-base text-white/90 mb-5 max-w-xl">
+                    Explore research-backed articles, practical strategies, and expert
+                    insights to better understand autism, ADHD, and child development.
+                  </p>
+
+                  {/* Search */}
+                  <div className="max-w-md">
+                    <div className="relative">
+                      <MagnifyingGlassIcon className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="Search articles..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-9 pr-3 py-2 text-sm border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-lg bg-white/95 backdrop-blur-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Heading */}
-              <h1 className="text-3xl sm:text-3xl lg:text-5xl font-bold text-white mb-3 leading-tight">
-                Insights to Support
-                <span className="block text-blue-200">
-                  Autism & Child Development
-                </span>
-              </h1>
+              {/* Right Side - Compact Contact Form (2 fields per row) */}
+              <div className="lg:w-96 xl:w-[450px] w-full">
+                <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-5">
+                  <div className="mb-4 text-center">
+                    <h2 className="text-xl font-bold text-slate-800">Get Expert Guidance</h2>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Fill the form and proceed to payment
+                    </p>
+                  </div>
 
-              {/* Subtext */}
-              <p className="text-sm sm:text-base text-white/90 mb-5 max-w-xl mx-auto">
-                Explore research-backed articles, practical strategies, and expert
-                insights to better understand autism, ADHD, and child development.
-              </p>
+                  {isSubmitted && (
+                    <div className="mb-4 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
+                      <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                      <span>Form submitted! Redirecting to payment...</span>
+                    </div>
+                  )}
 
-              {/* Search */}
-              <div className="max-w-md mx-auto">
-                <div className="relative">
-                  <MagnifyingGlassIcon className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search articles..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-sm border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-lg bg-white/95 backdrop-blur-sm"
-                  />
+                  {submitError && (
+                    <div className="mb-4 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                      <span>{submitError}</span>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleSubmit} className="space-y-3">
+                    {/* Row 1: Full Name + Email */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="mb-1 block text-left text-xs font-medium text-slate-700">Full Name *</label>
+                        <div className="relative">
+                          <User className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                          <input
+                            type="text"
+                            name="fullName"
+                            value={formData.fullName}
+                            onChange={handleChange}
+                            placeholder="Full name"
+                            className={`w-full rounded-lg border pl-8 pr-2 py-1.5 text-xs outline-none focus:ring-2 focus:ring-blue-500 ${
+                              errors.fullName ? "border-red-400 bg-red-50" : "border-slate-300"
+                            }`}
+                          />
+                        </div>
+                        {errors.fullName && <p className="mt-0.5 text-left text-[10px] text-red-500">{errors.fullName}</p>}
+                      </div>
+
+                      <div>
+                        <label className="mb-1 block text-left text-xs font-medium text-slate-700">Email *</label>
+                        <div className="relative">
+                          <Mail className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                          <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="Email"
+                            className={`w-full rounded-lg border pl-8 pr-2 py-1.5 text-xs outline-none focus:ring-2 focus:ring-blue-500 ${
+                              errors.email ? "border-red-400 bg-red-50" : "border-slate-300"
+                            }`}
+                          />
+                        </div>
+                        {errors.email && <p className="mt-0.5 text-left text-[10px] text-red-500">{errors.email}</p>}
+                      </div>
+                    </div>
+
+                    {/* Row 2: Phone + Address */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="mb-1 block text-left text-xs font-medium text-slate-700">Phone *</label>
+                        <div className="relative">
+                          <Phone className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                          <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            placeholder="Phone"
+                            className={`w-full rounded-lg border pl-8 pr-2 py-1.5 text-xs outline-none focus:ring-2 focus:ring-blue-500 ${
+                              errors.phone ? "border-red-400 bg-red-50" : "border-slate-300"
+                            }`}
+                          />
+                        </div>
+                        {errors.phone && <p className="mt-0.5 text-left text-[10px] text-red-500">{errors.phone}</p>}
+                      </div>
+
+                      <div>
+                        <label className="mb-1 block text-left text-xs font-medium text-slate-700">Address *</label>
+                        <div className="relative">
+                          <MapPin className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                          <input
+                            type="text"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleChange}
+                            placeholder="Address"
+                            className={`w-full rounded-lg border pl-8 pr-2 py-1.5 text-xs outline-none focus:ring-2 focus:ring-blue-500 ${
+                              errors.address ? "border-red-400 bg-red-50" : "border-slate-300"
+                            }`}
+                          />
+                        </div>
+                        {errors.address && <p className="mt-0.5 text-left text-[10px] text-red-500">{errors.address}</p>}
+                      </div>
+                    </div>
+
+                    {/* Row 3: Message - Full Width */}
+                    <div>
+                      <label className="mb-1 block text-left text-xs font-medium text-slate-700">Message *</label>
+                      <div className="relative">
+                        <FileText className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400" />
+                        <textarea
+                          name="message"
+                          rows="2"
+                          value={formData.message}
+                          onChange={handleChange}
+                          placeholder="Tell us about your child's age and concerns..."
+                          className={`w-full rounded-lg border pl-8 pr-2 py-1.5 text-xs outline-none resize-none focus:ring-2 focus:ring-blue-500 ${
+                            errors.message ? "border-red-400 bg-red-50" : "border-slate-300"
+                          }`}
+                        />
+                      </div>
+                      {errors.message && <p className="mt-0.5 text-left text-[10px] text-red-500">{errors.message}</p>}
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2 text-sm font-semibold hover:from-blue-700 hover:to-indigo-700 transition disabled:opacity-70 flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? (
+                        "Submitting..."
+                      ) : (
+                        <>
+                          <Send className="w-3.5 h-3.5" />
+                          Submit & Proceed to Payment
+                        </>
+                      )}
+                    </button>
+                  </form>
+
+                  {/* Trust Badge */}
+                  <div className="mt-3 pt-2 border-t border-slate-200">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-1.5 text-center">
+                      <p className="text-[10px] text-slate-600">
+                        🔒 Your information is secure. No spam, guaranteed.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -168,9 +426,9 @@ export default function BlogPage() {
                   </span>
 
                   {/* Title */}
-                <h3 className="mt-3 font-bold text-gray-900 text-lg leading-tight line-clamp-2">
-  {blog.title}
-</h3>
+                  <h3 className="mt-3 font-bold text-gray-900 text-lg leading-tight line-clamp-2">
+                    {blog.title}
+                  </h3>
 
                   {/* Description */}
                   <p className="text-medium text-gray-600 mt-2 line-clamp-3 leading-relaxed">

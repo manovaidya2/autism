@@ -57,7 +57,7 @@ const Sidebar = () => {
       label: "Teen Wellness",
       iconColor: "text-green-400",
       submenu: [
-        { label: "Blogs & Articles", path: "/Admin-Teenage", icon: <FaClipboardList /> },
+        { label: "Blogs & Articles", path: "/teenage dashboard", icon: <FaClipboardList /> },
         { label: "Counseling", path: "/admin-teen-counseling", icon: <FaUserGraduate /> },
         { label: "Workshops", path: "/admin-teen-workshops", icon: <FaRegCalendarAlt /> },
       ],
@@ -104,22 +104,21 @@ const Sidebar = () => {
 
   return (
     <div className="relative w-72 bg-gradient-to-b from-slate-900 via-blue-900 to-indigo-900 text-white h-screen flex flex-col shadow-2xl">
-      {/* Decorative Background Elements */}
+      {/* Decorative Background Elements - Removed animations */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-20 -left-20 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
-        <div className="absolute bottom-20 -right-20 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
+        <div className="absolute top-20 -left-20 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>
+        <div className="absolute bottom-20 -right-20 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-600 rounded-full filter blur-3xl opacity-5"></div>
       </div>
 
-      {/* Logo Section with Glow Effect */}
+      {/* Logo Section - Removed glow effect */}
       <div className="relative px-6 pt-8 pb-6 border-b border-white/10">
         <div className="flex items-center justify-center">
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl blur-xl opacity-50"></div>
             <img
               src={logo}
               alt="Manovaidya Logo"
-              className="relative w-44 h-auto object-contain drop-shadow-2xl"
+              className="relative w-44 h-auto object-contain"
             />
           </div>
         </div>
@@ -129,7 +128,7 @@ const Sidebar = () => {
       </div>
 
       {/* Navigation Menu */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden py-6 px-4 scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-transparent">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden py-6 px-4">
         <nav className="space-y-1.5">
           {menuItems.map((item) => (
             <div key={item.id}>
@@ -137,7 +136,7 @@ const Sidebar = () => {
                 <Link
                   to={item.path}
                   className={`
-                    group relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300
+                    group relative flex items-center gap-3 px-4 py-3 rounded-xl
                     ${isActive(item.path) 
                       ? "bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/30 text-white" 
                       : "hover:bg-white/10 text-gray-300 hover:text-white"
@@ -149,9 +148,9 @@ const Sidebar = () => {
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-yellow-400 to-orange-500 rounded-r-full"></div>
                   )}
                   
-                  {/* Icon with Animation */}
+                  {/* Icon */}
                   <span className={`
-                    text-xl transition-transform duration-300 group-hover:scale-110
+                    text-xl
                     ${item.iconColor || (isActive(item.path) ? "text-white" : "text-gray-400")}
                   `}>
                     {item.icon}
@@ -160,7 +159,7 @@ const Sidebar = () => {
                   <span className="flex-1 font-medium text-sm tracking-wide">{item.label}</span>
                   
                   {item.badge && (
-                    <span className="px-2 py-0.5 text-xs font-bold bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 rounded-full animate-pulse">
+                    <span className="px-2 py-0.5 text-xs font-bold bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 rounded-full">
                       {item.badge}
                     </span>
                   )}
@@ -171,7 +170,7 @@ const Sidebar = () => {
                   <button
                     onClick={() => toggleMenu(item.id)}
                     className={`
-                      w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all duration-300
+                      w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl
                       ${openMenu === item.id 
                         ? "bg-white/15 text-white shadow-lg" 
                         : "hover:bg-white/10 text-gray-300 hover:text-white"
@@ -179,24 +178,23 @@ const Sidebar = () => {
                     `}
                   >
                     <div className="flex items-center gap-3">
-                      <span className={`text-xl transition-transform duration-300 ${item.iconColor || "text-gray-400"}`}>
+                      <span className={`text-xl ${item.iconColor || "text-gray-400"}`}>
                         {item.icon}
                       </span>
                       <span className="font-medium text-sm tracking-wide">{item.label}</span>
                     </div>
-                    <span className={`transition-all duration-300 ${openMenu === item.id ? "rotate-180" : ""}`}>
+                    <span className={`${openMenu === item.id ? "rotate-180" : ""}`}>
                       <FaChevronDown className="text-xs" />
                     </span>
                   </button>
 
-                  {/* Submenu with Animation */}
+                  {/* Submenu */}
                   <div
                     className={`
-                      overflow-hidden transition-all duration-300 ease-in-out
-                      ${openMenu === item.id ? "max-h-96 opacity-100 mt-2" : "max-h-0 opacity-0"}
+                      ${openMenu === item.id ? "block" : "hidden"}
                     `}
                   >
-                    <div className="ml-11 space-y-1 relative">
+                    <div className="ml-11 space-y-1 relative mt-2">
                       {/* Vertical Line */}
                       <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-blue-400 to-purple-400 opacity-30"></div>
                       
@@ -205,7 +203,7 @@ const Sidebar = () => {
                           key={idx}
                           to={sub.path}
                           className={`
-                            flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-300 text-sm
+                            flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm
                             ${isActive(sub.path)
                               ? "bg-blue-600/50 text-white"
                               : "text-gray-400 hover:text-white hover:bg-white/5"
@@ -215,7 +213,7 @@ const Sidebar = () => {
                           <span className="text-xs">{sub.icon}</span>
                           <span className="font-medium">{sub.label}</span>
                           {isActive(sub.path) && (
-                            <span className="ml-auto w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                            <span className="ml-auto w-1.5 h-1.5 bg-green-400 rounded-full"></span>
                           )}
                         </Link>
                       ))}
@@ -228,45 +226,7 @@ const Sidebar = () => {
         </nav>
       </div>
 
-      {/* Footer Section */}
-      <div className="relative p-4 border-t border-white/10 mt-auto">
-        <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              <FaHeartbeat className="text-white text-sm" />
-            </div>
-            <div className="flex-1">
-              <p className="text-xs font-medium text-gray-300">Need Support?</p>
-              <p className="text-xs text-blue-300">24/7 Helpline Available</p>
-            </div>
-          </div>
-          <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-semibold py-2 rounded-lg transition-all duration-300 transform hover:scale-105">
-            Contact Support
-          </button>
-        </div>
-        
-        {/* Version Info */}
-        <div className="text-center mt-4">
-          <p className="text-[10px] text-gray-500 tracking-wide">v2.0.0 | © 2026 Manovaidya</p>
-        </div>
-      </div>
-
-      {/* Custom Scrollbar Styles */}
-      <style jsx>{`
-        .scrollbar-thin::-webkit-scrollbar {
-          width: 4px;
-        }
-        .scrollbar-thin::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-          background: rgba(59, 130, 246, 0.5);
-          border-radius: 10px;
-        }
-        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-          background: rgba(59, 130, 246, 0.8);
-        }
-      `}</style>
+      {/* Footer Section - Empty as in original */}
     </div>
   );
 };

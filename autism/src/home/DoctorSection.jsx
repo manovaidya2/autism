@@ -1,5 +1,6 @@
 import React from "react";
 import { FaStethoscope, FaUserFriends, FaStar } from "react-icons/fa";
+import img from "../images/White coat (3).webp";
 
 export default function DoctorSection() {
   return (
@@ -11,7 +12,7 @@ export default function DoctorSection() {
           <div className="flex justify-center md:justify-start">
             <div className="w-full max-w-[320px] md:max-w-[380px] lg:max-w-[420px] rounded-[20px] overflow-hidden shadow-lg border-4 border-white">
               <img
-                src="https://drankushgarg.com/assets/doctor%202-Dm4JGNzF.webp"
+                src={img}
                 alt="Dr Ankush Garg"
                 className="w-full h-full object-cover"
               />

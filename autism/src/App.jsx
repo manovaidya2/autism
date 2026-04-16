@@ -6,8 +6,12 @@ import CTAFooterSection from "./components/CTAFooterSection";
 import BlogPage from "./blog/BlogPage";
 import BlogDetails from "./blog/BlogDetails";
 import ScrollToHash from "./components/ScrollToHash";
-import ContactForm from "./components/ContactForm";
+// import ContactForm from "./components/ContactForm";
 import VideoGalleryPage from "./home/VideoGalleryPage";
+// import ContactPage from "./components/ContactPage";
+// import ContactFormComponent from "./components/ContactFormComponent";
+import CompactContactForm from "./components/CompactContactForm";
+import ContactForm from "./components/ContactForm";
 
 
 function App() {
@@ -21,6 +25,7 @@ function App() {
           <Route path="/blog/:slug" element={<BlogDetails />} />
           <Route path="/contact" element={<ContactForm />} />
           <Route path="/testimonial-video" element={<VideoGalleryPage />} />
+          <Route path="/contact-form" element={<CompactContactForm />} />
       </Routes>
 <CTAFooterSection />
     </Router>

@@ -55,6 +55,15 @@ const ContactForm = () => {
       
       if (response.data.success || response.status === 200 || response.status === 201) {
         setIsSubmitted(true);
+        
+        // Store form data in localStorage for payment page if needed
+        localStorage.setItem("contactFormData", JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          message: formData.message
+        }));
+        
         setFormData({
           fullName: "",
           email: "",
@@ -62,10 +71,11 @@ const ContactForm = () => {
           address: "",
           message: "",
         });
-        // Auto-hide success message after 5 seconds
+        
+        // Redirect to payment link after successful submission
         setTimeout(() => {
-          setIsSubmitted(false);
-        }, 5000);
+          window.location.href = "https://rzp.io/rzp/FjMRvHOy";
+        }, 1500); // 1.5 second delay to show success message
       } else {
         setSubmitError(response.data.message || 'Failed to send message. Please try again.');
       }
@@ -184,7 +194,7 @@ const ContactForm = () => {
             {isSubmitted && (
               <div className="m-4 mb-0 bg-emerald-50 border border-emerald-200 rounded-lg p-3 flex items-center space-x-2 animate-in slide-in-from-top-2 duration-300">
                 <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                <p className="text-emerald-700 text-xs">Message sent successfully! We'll get back to you soon.</p>
+                <p className="text-emerald-700 text-xs">Form submitted! Redirecting to payment...</p>
               </div>
             )}
 
@@ -331,12 +341,12 @@ const ContactForm = () => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <span>Sending...</span>
+                    <span>Submitting...</span>
                   </>
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    <span>Send Message</span>
+                    <span>Submit & Proceed to Payment</span>
                   </>
                 )}
               </button>
