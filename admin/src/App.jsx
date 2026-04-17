@@ -10,6 +10,7 @@ import AdminBlogDashboard from "./pages/AdminBlogDashboard";
 import AutismEditBlog from "./pages/AutismEditBlog";
 import AdminAddBlog from "./pages/AdminAddBlog";
 import TeenageBlogAdminDashboard from "./teenage/TeenageBlogAdminDashboard";
+import TeenageContact from "./teenage/TeenageContact";
 
 
 
@@ -31,6 +32,7 @@ function App() {
            <Route path="/admin-addblog" element={<Layout><AdminAddBlog/></Layout>} />
            <Route path="/admin/edit-blog/:id" element={<Layout><AutismEditBlog/></Layout>} />
            <Route path ="/teenage dashboard" element={<Layout><TeenageBlogAdminDashboard/></Layout>} />
+           <Route path = "/teenage-contact" element={<Layout><TeenageContact/></Layout>} />
     
         </Routes>
       </Router>

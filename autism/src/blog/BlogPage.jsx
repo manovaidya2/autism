@@ -119,7 +119,7 @@ export default function BlogPage() {
 
         // Redirect to payment link after successful submission
         setTimeout(() => {
-          window.location.href = "https://rzp.io/rzp/FjMRvHOy";
+          window.location.href = "https://rzp.io/rzp/ZQr39j1";
         }, 1500);
       } else {
         setSubmitError(response.data.message || "Failed to submit form.");

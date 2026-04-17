@@ -7,6 +7,7 @@
       import teenageBlogRoutes from "./routes/teenageBlogRoutes.js";
 import adultBlogRoutes from "./routes/adultBlogRoutes.js";
 import autismRoutes from "./routes/autismContactRoutes.js";
+import teenageContactRoutes from './routes/teenageContactRoutes.js'; 
 
 
       const app = express();
@@ -30,10 +31,11 @@ import autismRoutes from "./routes/autismContactRoutes.js";
 
     //use routes
   
-   app.use("/api/blogs", blogRoutes);
+app.use("/api/blogs", blogRoutes);
 app.use("/api", teenageBlogRoutes);
 app.use("/api/adult-blogs", adultBlogRoutes);
 app.use("/api/autism/contact", autismRoutes);
+app.use('/api', teenageContactRoutes);
 
 
 

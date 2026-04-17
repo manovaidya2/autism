@@ -58,7 +58,7 @@ const Sidebar = () => {
       iconColor: "text-green-400",
       submenu: [
         { label: "Blogs & Articles", path: "/teenage dashboard", icon: <FaClipboardList /> },
-        { label: "Counseling", path: "/admin-teen-counseling", icon: <FaUserGraduate /> },
+        { label: "Contact Us", path: "/teenage-contact", icon: <FaUserGraduate /> },
         { label: "Workshops", path: "/admin-teen-workshops", icon: <FaRegCalendarAlt /> },
       ],
       type: "dropdown",
