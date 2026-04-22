@@ -33,7 +33,7 @@ import teenageContactRoutes from './routes/teenageContactRoutes.js';
   
 app.use("/api/blogs", blogRoutes);
 app.use("/api", teenageBlogRoutes);
-app.use("/api/adult-blogs", adultBlogRoutes);
+app.use("/api/adultblog", adultBlogRoutes); 
 app.use("/api/autism/contact", autismRoutes);
 app.use('/api', teenageContactRoutes);
 

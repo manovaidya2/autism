@@ -69,7 +69,7 @@ const Sidebar = () => {
       label: "Adult Mental Health",
       iconColor: "text-purple-400",
       submenu: [
-        { label: "Blogs", path: "/Admin-Adult", icon: <FaClipboardList /> },
+        { label: "Blogs", path: "/admin/adult-blog", icon: <FaClipboardList /> },
         { label: "Self-Help", path: "/admin-adult-selfhelp", icon: <GiHeartPlus /> },
         { label: "Support Groups", path: "/admin-adult-support", icon: <FaUsers /> },
       ],
@@ -151,7 +151,7 @@ const Sidebar = () => {
                   {/* Icon */}
                   <span className={`
                     text-xl
-                    ${item.iconColor || (isActive(item.path) ? "text-white" : "text-gray-400")}
+                    ${item.iconColor || (isActive(item.path) ? "text-white" : "text-white")}
                   `}>
                     {item.icon}
                   </span>

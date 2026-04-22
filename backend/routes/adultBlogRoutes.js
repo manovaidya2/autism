@@ -1,27 +1,24 @@
+// File: adultBlogRoutes.js
 import express from "express";
 import {
   createAdultBlog,
-  getAllAdultBlogs,
+  getAdultBlogs,
+  getAdultBlogById,
   getAdultBlogBySlug,
   updateAdultBlog,
-  deleteAdultBlog,
-  getAdultBlogsByCategory,
+  deleteAdultBlog
 } from "../controllers/adultBlogController.js";
 
 const router = express.Router();
 
-router.route("/")
-  .post(createAdultBlog)
-  .get(getAllAdultBlogs);
+// Public routes
+router.get("/", getAdultBlogs);
+router.get("/slug/:slug", getAdultBlogBySlug); // Use this for public blog viewing
 
-router.route("/:slug")
-  .get(getAdultBlogBySlug);
-
-router.route("/category/:category")
-  .get(getAdultBlogsByCategory);
-
-router.route("/:id")
-  .put(updateAdultBlog)
-  .delete(deleteAdultBlog);
+// Admin routes (with id)
+router.get("/admin/:id", getAdultBlogById);    // For admin edit
+router.post("/", createAdultBlog);
+router.put("/admin/:id", updateAdultBlog);
+router.delete("/admin/:id", deleteAdultBlog);
 
 export default router;

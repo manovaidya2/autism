@@ -1,49 +1,73 @@
+// File: AdultBlog.js (Model)
 import mongoose from "mongoose";
+
+const adultFaqSchema = new mongoose.Schema({
+  question: {
+    type: String,
+    required: true
+  },
+  answer: {
+    type: String,
+    required: true
+  }
+});
 
 const adultBlogSchema = new mongoose.Schema(
   {
     title: {
       type: String,
       required: true,
-      trim: true,
+      trim: true
     },
     slug: {
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
       trim: true,
+      lowercase: true
+    },
+    author: {
+      type: String,
+      required: true,
+      trim: true
     },
     category: {
       type: String,
-      trim: true,
+      default: "Mental Health"
     },
     date: {
       type: Date,
-      default: Date.now,
+      default: Date.now
     },
     image: {
       type: String,
-      default: "",
+      default: ""
     },
     shortDescription: {
       type: String,
-      trim: true,
+      default: ""
     },
     content: {
       type: String,
-      required: true,
+      required: true
     },
+    tags: [{
+      type: String,
+      trim: true
+    }],
+    views: {
+      type: String,
+      default: "0"
+    },
+    faqs: [adultFaqSchema]
   },
   {
-    timestamps: true,
+    timestamps: true
   }
 );
 
-// Create index for better query performance
-adultBlogSchema.index({ slug: 1 });
-adultBlogSchema.index({ category: 1 });
-adultBlogSchema.index({ createdAt: -1 });
+// Create index for search functionality
+adultBlogSchema.index({ title: "text", content: "text", tags: "text" });
 
 const AdultBlog = mongoose.model("AdultBlog", adultBlogSchema);
 

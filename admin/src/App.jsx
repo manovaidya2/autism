@@ -4,13 +4,16 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Layout from "./components/Layout";
 import TeenageBlog from "./pages/TeenageBlog";
-import AdultBlog from "./pages/AdultBlog";
+
 import AutismContactPanel from "./pages/AutismContactPanel";
 import AdminBlogDashboard from "./pages/AdminBlogDashboard";
 import AutismEditBlog from "./pages/AutismEditBlog";
 import AdminAddBlog from "./pages/AdminAddBlog";
 import TeenageBlogAdminDashboard from "./teenage/TeenageBlogAdminDashboard";
 import TeenageContact from "./teenage/TeenageContact";
+import AdultBlog from "./adult/AdultBlog";
+import AdultBlogDashboard from "./adult/AdultBlogDashboard";
+import AdultBlogForm from "./adult/AdultBlogForm";
 
 
 
@@ -33,6 +36,10 @@ function App() {
            <Route path="/admin/edit-blog/:id" element={<Layout><AutismEditBlog/></Layout>} />
            <Route path ="/teenage dashboard" element={<Layout><TeenageBlogAdminDashboard/></Layout>} />
            <Route path = "/teenage-contact" element={<Layout><TeenageContact/></Layout>} />
+           <Route path="/admin/adult-blog/edit/:id" element={<Layout><AdultBlogForm /></Layout>} />
+           <Route path="/admin/adult-blog" element={<Layout><AdultBlogDashboard /></Layout>} />
+
+         
     
         </Routes>
       </Router>

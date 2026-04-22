@@ -1,79 +1,41 @@
 import React, { useState } from "react";
-import {
-  FaBrain,
-  FaHeartbeat,
-  FaBatteryFull,
-  FaBed,
-  FaCloudSun,
-  FaTheaterMasks,
-  FaExclamationTriangle,
-  FaRunning,
-  FaRegSnowflake,
-} from "react-icons/fa";
-import { User, Mail, Phone, MapPin, FileText, Send, AlertCircle, CheckCircle } from "lucide-react";
+import { X, Check, User, Mail, Phone, MapPin, FileText, Send, AlertCircle, CheckCircle } from "lucide-react";
 import axiosInstance from "../api/axiosInstance";
 
 const data = [
   {
-    icon: <FaBrain />,
-    title: "Constant Stress & Mental Pressure",
-    desc: "An always-on mind, racing thoughts at work, and the inability to truly relax — even on weekends or vacations.",
+    myth: "Stress is just a part of adult life — accept it",
+    fact: "Chronic stress isn't a personality trait, it's a physiological state. When stress becomes constant, it changes brain chemistry, weakens the immune system, disrupts the gut, and accelerates aging. It can — and should — be addressed.",
   },
   {
-    icon: <FaHeartbeat />,
-    title: "Anxiety & Overthinking",
-    desc: "Persistent worry, second-guessing decisions, anticipating worst-case scenarios, and a knot in the stomach that never fully leaves.",
+    myth: "I just need better time management",
+    fact: "If anxiety, burnout, or brain fog persist despite your best efforts to organize your life, the problem isn't your calendar. It's a dysregulated nervous system, an inflamed gut, or imbalanced brain chemistry that no productivity hack can fix.",
   },
   {
-    icon: <FaBatteryFull />,
-    title: "Burnout & Emotional Exhaustion",
-    desc: "Feeling drained despite rest, losing interest in things you once enjoyed, and dragging yourself through each day.",
+    myth: "Sleep issues are normal as you get older",
+    fact: "Quality sleep is biologically possible at every age. Insomnia and broken sleep are signals — usually pointing to cortisol dysregulation, blood sugar imbalance, gut inflammation, or nervous system overload. They are correctable, not inevitable.",
   },
   {
-    icon: <FaBed />,
-    title: "Sleep Problems & Insomnia",
-    desc: "Difficulty falling asleep, waking up at 3 AM, or sleeping for 8 hours and still feeling unrefreshed in the morning.",
+    myth: "Anxiety is just overthinking",
+    fact: "Anxiety is a full-body biological response involving the amygdala, vagus nerve, gut microbiome, and stress hormones. Telling someone to 'just stop worrying' ignores the deep biology driving the experience.",
   },
   {
-    icon: <FaCloudSun />,
-    title: "Brain Fog & Poor Focus",
-    desc: "Walking into rooms and forgetting why, struggling to concentrate at work, and feeling mentally cloudy throughout the day.",
+    myth: "Medication is the only real answer",
+    fact: "Medication has its place, but it manages symptoms — it doesn't address why your brain, gut, and nervous system became dysregulated in the first place. Lasting balance comes from root-cause correction, with or without medication.",
   },
   {
-    icon: <FaTheaterMasks />,
-    title: "Mood Swings & Irritability",
-    desc: "Snapping at family for small things, feeling emotionally reactive, and noticing your patience is at an all-time low.",
-  },
-  {
-    icon: <FaRegSnowflake />,
-    title: "Low Energy & Chronic Fatigue",
-    desc: "Needing coffee just to function, an afternoon energy crash, and the feeling that your battery is permanently at 20%.",
-  },
-  {
-    icon: <FaExclamationTriangle />,
-    title: "Digestive Discomfort & Gut Imbalance",
-    desc: "Bloating, acidity, IBS-like symptoms, and the realization that your digestion gets worse when you're stressed.",
-  },
-  {
-    icon: <FaRunning />,
-    title: "Panic Episodes & Inner Restlessness",
-    desc: "Sudden waves of overwhelm, heart racing for no reason, and an internal sense of restlessness that won't settle.",
-  },
-  {
-    icon: <FaHeartbeat />,
-    title: "Lack of Motivation & Withdrawal",
-    desc: "Losing drive for goals that once excited you, withdrawing from social connection, and feeling emotionally flat.",
+    myth: "Burnout will go away on its own with rest",
+    fact: "True burnout is a state of nervous system exhaustion and biological depletion. A weekend off won't fix it. It requires structured recovery — addressing sleep, nutrition, gut health, and the underlying stress patterns that caused it.",
   },
 ];
 
-export default function ChallengeSection() {
+const MythsFacts = () => {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     phone: "",
     address: "",
     message: "",
-    selectedChallenges: [],
   });
 
   const [errors, setErrors] = useState({});
@@ -115,18 +77,6 @@ export default function ChallengeSection() {
     if (submitError) setSubmitError("");
   };
 
-  const handleChallengeToggle = (challengeTitle) => {
-    setFormData((prev) => {
-      const isSelected = prev.selectedChallenges.includes(challengeTitle);
-      return {
-        ...prev,
-        selectedChallenges: isSelected
-          ? prev.selectedChallenges.filter(c => c !== challengeTitle)
-          : [...prev.selectedChallenges, challengeTitle]
-      };
-    });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -139,13 +89,8 @@ export default function ChallengeSection() {
     setIsSubmitting(true);
     setSubmitError("");
 
-    const submitData = {
-      ...formData,
-      challenges: formData.selectedChallenges.join(", "),
-    };
-
     try {
-      const response = await axiosInstance.post("/mental-health/consultation/create", submitData);
+      const response = await axiosInstance.post("/mental-health/consultation/create", formData);
 
       if (response.data.success || response.status === 200 || response.status === 201) {
         setIsSubmitted(true);
@@ -155,7 +100,7 @@ export default function ChallengeSection() {
           fullName: formData.fullName,
           email: formData.email,
           phone: formData.phone,
-          challenges: formData.selectedChallenges
+          message: formData.message
         }));
         
         setFormData({
@@ -164,7 +109,6 @@ export default function ChallengeSection() {
           phone: "",
           address: "",
           message: "",
-          selectedChallenges: [],
         });
 
         // Redirect to payment link after successful submission
@@ -188,58 +132,54 @@ export default function ChallengeSection() {
   };
 
   return (
-    <section
-      id="challenges"
-      className="w-full py-8 sm:py-10 px-4 sm:px-6 md:px-16 bg-[#f7f9fc]"
-    >
+    <section className="bg-white py-10 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Heading */}
+        {/* Title Section */}
         <div className="text-center">
-          <h2 className="text-[24px] sm:text-[34px] md:text-[38px] font-bold text-[#1a1a2e] leading-snug sm:leading-tight">
-            Are You Facing These Challenges?
-            <br className="hidden sm:block" /> 
-            <span className="text-[#6c8ef5]">You're Not Alone</span>
+          <h2 className="text-3xl md:text-[38px] font-bold text-[#1e293b] leading-tight">
+            What Most People Get Wrong About<br/> Adult Stress & Anxiety
           </h2>
-
-          <p className="mt-3 sm:mt-4 text-[#6b7280] text-[13.5px] sm:text-[15px] max-w-2xl mx-auto leading-relaxed">
-            If any of these feel familiar, you're not alone — and you're not broken. 
-            These are signals from a system that needs structured support.
+          <p className="text-center text-gray-500 mt-4 max-w-2xl mx-auto">
+            Common beliefs that keep millions of adults stuck — and the science-backed truths that can set you free.
           </p>
         </div>
 
-        {/* Two Column Layout - Grid on Left, Form on Right */}
-        <div className="mt-8 sm:mt-14 flex flex-col lg:flex-row gap-6 lg:gap-8">
+        {/* Two Column Layout */}
+        <div className="mt-12 flex flex-col lg:flex-row gap-6 lg:gap-8">
           
-          {/* Left Side - Challenges Grid */}
+          {/* Left Side - Myths & Facts Cards */}
           <div className="flex-1">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              {data.map((item, i) => (
+            <div className="space-y-5">
+              {data.map((item, index) => (
                 <div
-                  key={i}
-                  className="bg-white border border-[#e3e8f2] rounded-xl sm:rounded-2xl p-4 sm:p-6 text-left shadow-sm hover:shadow-md transition cursor-pointer"
-                  onClick={() => handleChallengeToggle(item.title)}
+                  key={index}
+                  className="grid md:grid-cols-2 border border-[#c7d2fe] rounded-xl overflow-hidden"
                 >
-                  {/* Icon */}
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg bg-[#eef3ff] text-[#6c8ef5] text-base sm:text-lg mb-3 sm:mb-4">
-                    {item.icon}
+                  {/* Myth */}
+                  <div className="bg-[#fff1f2] p-6 md:p-7 flex gap-3 items-start">
+                    <div className="flex items-center justify-center w-6 h-6 rounded-full border border-red-400 text-red-500 flex-shrink-0">
+                      <X size={14} />
+                    </div>
+                    <div>
+                      <p className="text-red-500 text-xs font-semibold mb-1">MYTH</p>
+                      <p className="text-[#1e293b] font-medium leading-relaxed text-sm md:text-base">
+                        {item.myth}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Title */}
-                  <h3 className="text-[14px] sm:text-[15px] font-semibold text-[#1a1a2e]">
-                    {item.title}
-                  </h3>
-
-                  {/* Desc */}
-                  <p className="mt-1.5 sm:mt-2 text-[12.5px] sm:text-[13.5px] text-[#6b7280] leading-relaxed">
-                    {item.desc}
-                  </p>
-
-                  {/* Show checkmark if selected */}
-                  {formData.selectedChallenges.includes(item.title) && (
-                    <div className="mt-2 text-green-600 text-xs font-semibold flex items-center gap-1">
-                      <span>✓</span> Selected
+                  {/* Fact */}
+                  <div className="bg-[#eff6ff] p-6 md:p-7 flex gap-3 items-start">
+                    <div className="flex items-center justify-center w-6 h-6 rounded-full border border-blue-400 text-blue-500 flex-shrink-0">
+                      <Check size={14} />
                     </div>
-                  )}
+                    <div>
+                      <p className="text-blue-500 text-xs font-semibold mb-1">TRUTH</p>
+                      <p className="text-[#1e293b] leading-relaxed text-sm md:text-base">
+                        {item.fact}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -248,16 +188,11 @@ export default function ChallengeSection() {
           {/* Right Side - Contact Form */}
           <div className="lg:w-96 xl:w-[400px]">
             <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-5 sticky top-6">
-              <div className="mb-4 text-center">
+              <div className="mb-4 text-left">
                 <h2 className="text-2xl font-bold text-slate-800">Get Help Now</h2>
                 <p className="text-sm text-slate-500 mt-1">
                   Fill the form and proceed to payment
                 </p>
-                {formData.selectedChallenges.length > 0 && (
-                  <p className="text-xs text-blue-600 mt-2">
-                    Selected: {formData.selectedChallenges.length} challenge(s)
-                  </p>
-                )}
               </div>
 
               {isSubmitted && (
@@ -356,7 +291,7 @@ export default function ChallengeSection() {
                       rows="3"
                       value={formData.message}
                       onChange={handleChange}
-                      placeholder="Describe your challenges and what support you're looking for..."
+                      placeholder="Describe your symptoms or ask your question..."
                       className={`w-full rounded-lg border pl-10 pr-3 py-2 text-sm outline-none resize-none focus:ring-2 focus:ring-blue-500 ${
                         errors.message ? "border-red-400 bg-red-50" : "border-slate-300"
                       }`}
@@ -381,18 +316,17 @@ export default function ChallengeSection() {
                 </button>
               </form>
 
-              {/* Bottom Highlight Box inside sidebar */}
+              {/* Motivational Quote */}
               <div className="mt-5 pt-4 border-t border-slate-200">
-                <div className="bg-[#f4e7c5] rounded-xl p-3 text-center">
-                  <p className="text-[12px] text-[#1a1a2e] font-medium leading-relaxed">
-                    "This isn't just your daily struggle —{" "}
-                    <span className="text-[#6c8ef5] font-semibold">
-                      it can affect your work, relationships, confidence, and quality of life.
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 text-center">
+                  <p className="text-[12px] text-[#1e293b] font-medium leading-relaxed">
+                    "Understanding the biology behind your symptoms is the{" "}
+                    <span className="text-blue-600 font-semibold">
+                      first step toward lasting relief.
                     </span>"
                   </p>
-                  <p className="mt-1 text-[11px] text-[#6b7280] leading-relaxed">
-                    The good news: every one of these symptoms has a biological root. 
-                    And every biological root can be addressed — systematically and sustainably.
+                  <p className="mt-1 text-[11px] text-gray-500">
+                    Get science-backed guidance tailored to your unique situation.
                   </p>
                 </div>
               </div>
@@ -402,4 +336,6 @@ export default function ChallengeSection() {
       </div>
     </section>
   );
-}
+};
+
+export default MythsFacts;

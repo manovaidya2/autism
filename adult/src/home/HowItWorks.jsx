@@ -1,5 +1,4 @@
 import React from "react";
-
 const HowItWorks = () => {
   return (
     <section id="how-it-works" className="bg-[#fdfcf9] py-10">
@@ -34,8 +33,8 @@ const HowItWorks = () => {
             </h3>
 
             <p className="text-gray-600 max-w-xs">
-              Complete a brief assessment form or connect with our care guide to
-              help us understand your concerns and goals.
+              Complete a brief assessment form or speak with our care guide to
+              help us understand your needs.
             </p>
           </div>
 
@@ -50,8 +49,8 @@ const HowItWorks = () => {
             </h3>
 
             <p className="text-gray-600 max-w-xs">
-              Our experts design a personalized wellness plan that blends
-              guidance, lifestyle changes, and holistic support.
+              Our specialists create a personalized care roadmap combining
+              therapy, lifestyle, and holistic support.
             </p>
           </div>
 
@@ -66,8 +65,8 @@ const HowItWorks = () => {
             </h3>
 
             <p className="text-gray-600 max-w-xs">
-              Ongoing follow-ups, progress monitoring, and plan adjustments help
-              you steadily move toward lasting improvements.
+              Regular follow-ups, progress tracking, and adjustments to ensure
+              you're moving toward your goals.
             </p>
           </div>
 
@@ -78,3 +77,4 @@ const HowItWorks = () => {
 };
 
 export default HowItWorks;
+

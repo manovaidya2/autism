@@ -1,173 +1,200 @@
+// File: adultBlogController.js
 import AdultBlog from "../models/AdultBlog.js";
 
-// @desc    Create a new adult blog
-// @route   POST /api/adult-blogs
-// @access  Public
+// CREATE
 export const createAdultBlog = async (req, res) => {
   try {
-    const { title, slug, category, date, image, shortDescription, content } = req.body;
-
-    // Check if blog with same slug exists
-    const existingBlog = await AdultBlog.findOne({ slug });
-    if (existingBlog) {
-      return res.status(409).json({
-        success: false,
-        message: "Blog with this slug already exists",
+    console.log("Received adult blog data:", req.body);
+    
+    const blogData = {
+      title: req.body.title,
+      slug: req.body.slug,
+      author: req.body.author,
+      category: req.body.category || "",
+      date: req.body.date ? new Date(req.body.date) : new Date(),
+      image: req.body.image || "",
+      shortDescription: req.body.shortDescription || "",
+      content: req.body.content || "",
+      tags: req.body.tags || [],
+      views: req.body.views || "0",
+      faqs: Array.isArray(req.body.faqs) ? req.body.faqs : []
+    };
+    
+    if (!blogData.title || !blogData.slug || !blogData.author) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Title, slug, and author are required fields" 
       });
     }
-
-    const blog = new AdultBlog({
-      title,
-      slug,
-      category,
-      date,
-      image,
-      shortDescription,
-      content,
-    });
-
+    
+    const blog = new AdultBlog(blogData);
     await blog.save();
-
-    res.status(201).json({
-      success: true,
-      message: "Adult blog created successfully",
-      data: blog,
+    
+    console.log("Adult blog saved successfully:", blog._id);
+    
+    res.status(201).json({ 
+      success: true, 
+      blog,
+      message: "Adult mental health blog created successfully" 
     });
   } catch (error) {
-    console.error("Create adult blog error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message || "Failed to create adult blog",
+    console.error("Error creating adult blog:", error);
+    
+    if (error.code === 11000) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Slug already exists. Please use a unique slug." 
+      });
+    }
+    
+    if (error.name === "ValidationError") {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ 
+        success: false, 
+        message: "Validation error", 
+        errors 
+      });
+    }
+    
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || "Server Error" 
     });
   }
 };
 
-// @desc    Get all adult blogs
-// @route   GET /api/adult-blogs
-// @access  Public
-export const getAllAdultBlogs = async (req, res) => {
+// GET ALL
+export const getAdultBlogs = async (req, res) => {
   try {
     const blogs = await AdultBlog.find().sort({ createdAt: -1 });
-    
-    res.status(200).json({
-      success: true,
-      count: blogs.length,
-      data: blogs,
-    });
+    res.json(blogs);
   } catch (error) {
-    console.error("Get adult blogs error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message || "Failed to fetch adult blogs",
-    });
+    console.error("Error fetching adult blogs:", error);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
-// @desc    Get single adult blog by slug
-// @route   GET /api/adult-blogs/:slug
-// @access  Public
+// GET BY ID
+export const getAdultBlogById = async (req, res) => {
+  try {
+    const blog = await AdultBlog.findById(req.params.id);
+    if (!blog) {
+      return res.status(404).json({ message: "Adult blog not found" });
+    }
+    res.json(blog);
+  } catch (error) {
+    console.error("Error fetching adult blog:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// GET BY SLUG
 export const getAdultBlogBySlug = async (req, res) => {
   try {
     const blog = await AdultBlog.findOne({ slug: req.params.slug });
-    
-    if (!blog) {
-      return res.status(404).json({
-        success: false,
-        message: "Adult blog not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: blog,
-    });
+    if (!blog) return res.status(404).json({ message: "Adult blog not found" });
+    res.json(blog);
   } catch (error) {
-    console.error("Get adult blog by slug error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message || "Failed to fetch adult blog",
-    });
+    console.error("Error fetching adult blog:", error);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
-// @desc    Update adult blog
-// @route   PUT /api/adult-blogs/:id
-// @access  Public
+// UPDATE
 export const updateAdultBlog = async (req, res) => {
   try {
-    const blog = await AdultBlog.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-
-    if (!blog) {
-      return res.status(404).json({
-        success: false,
-        message: "Adult blog not found",
+    console.log("Updating adult blog data:", req.body);
+    
+    const blogData = {
+      title: req.body.title,
+      slug: req.body.slug,
+      author: req.body.author,
+      category: req.body.category || "",
+      date: req.body.date ? new Date(req.body.date) : new Date(),
+      image: req.body.image || "",
+      shortDescription: req.body.shortDescription || "",
+      content: req.body.content || "",
+      tags: req.body.tags || [],
+      views: req.body.views || "0",
+      faqs: Array.isArray(req.body.faqs) ? req.body.faqs : []
+    };
+    
+    if (!blogData.title || !blogData.slug || !blogData.author) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Title, slug, and author are required fields" 
       });
     }
-
-    res.status(200).json({
-      success: true,
-      message: "Adult blog updated successfully",
-      data: blog,
+    
+    const blog = await AdultBlog.findByIdAndUpdate(
+      req.params.id,
+      blogData,
+      { new: true, runValidators: true }
+    );
+    
+    if (!blog) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Adult blog not found" 
+      });
+    }
+    
+    console.log("Adult blog updated successfully:", blog._id);
+    
+    res.json({ 
+      success: true, 
+      blog,
+      message: "Adult mental health blog updated successfully" 
     });
   } catch (error) {
-    console.error("Update adult blog error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message || "Failed to update adult blog",
+    console.error("Error updating adult blog:", error);
+    
+    if (error.code === 11000) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Slug already exists. Please use a unique slug." 
+      });
+    }
+    
+    if (error.name === "ValidationError") {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ 
+        success: false, 
+        message: "Validation error", 
+        errors 
+      });
+    }
+    
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || "Server Error" 
     });
   }
 };
 
-// @desc    Delete adult blog
-// @route   DELETE /api/adult-blogs/:id
-// @access  Public
+// DELETE
 export const deleteAdultBlog = async (req, res) => {
   try {
     const blog = await AdultBlog.findByIdAndDelete(req.params.id);
-
+    
     if (!blog) {
-      return res.status(404).json({
-        success: false,
-        message: "Adult blog not found",
+      return res.status(404).json({ 
+        success: false, 
+        message: "Adult blog not found" 
       });
     }
-
-    res.status(200).json({
-      success: true,
-      message: "Adult blog deleted successfully",
+    
+    console.log("Adult blog deleted successfully:", blog._id);
+    
+    res.json({ 
+      success: true, 
+      message: "Adult mental health blog deleted successfully" 
     });
   } catch (error) {
-    console.error("Delete adult blog error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message || "Failed to delete adult blog",
-    });
-  }
-};
-
-// @desc    Get adult blogs by category
-// @route   GET /api/adult-blogs/category/:category
-// @access  Public
-export const getAdultBlogsByCategory = async (req, res) => {
-  try {
-    const blogs = await AdultBlog.find({ 
-      category: req.params.category 
-    }).sort({ createdAt: -1 });
-
-    res.status(200).json({
-      success: true,
-      count: blogs.length,
-      data: blogs,
-    });
-  } catch (error) {
-    console.error("Get adult blogs by category error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message || "Failed to fetch adult blogs by category",
+    console.error("Error deleting adult blog:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || "Server Error" 
     });
   }
 };

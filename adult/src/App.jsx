@@ -3,9 +3,15 @@ import Header from "./components/Header";
 import Home from "./pages/Homepage";
 import React from "react";
 import CTAFooterSection from "./components/CTAFooterSection";
+import BlogPage from "./blog/BlogPage";
+import BlogDetails from "./blog/BlogDetails";
 import ScrollToHash from "./components/ScrollToHash";
-import AdultBlogList from "./blog/AdultBlogList";
-import AdultBlogDetails from "./blog/AdultBlogDetails";
+// import ContactForm from "./components/ContactForm";
+import VideoGalleryPage from "./home/VideoGalleryPage";
+// import ContactPage from "./components/ContactPage";
+// import ContactFormComponent from "./components/ContactFormComponent";
+import CompactContactForm from "./components/CompactContactForm";
+import ContactForm from "./components/ContactForm";
 
 
 function App() {
@@ -15,8 +21,11 @@ function App() {
 <ScrollToHash />
       <Routes>
         <Route path="/" element={<Home />} />
-  <Route path="/adult-blogs" element={<AdultBlogList />} />
-<Route path="/adult-blog/:slug" element={<AdultBlogDetails />} />
+            <Route path="/blog" element={<BlogPage />} />
+          <Route path="/adult-blog/:slug" element={<BlogDetails />} />
+          <Route path="/contact" element={<ContactForm />} />
+          <Route path="/testimonial-video" element={<VideoGalleryPage />} />
+          <Route path="/contact-form" element={<CompactContactForm />} />
       </Routes>
 <CTAFooterSection />
     </Router>
