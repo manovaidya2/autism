@@ -95,7 +95,7 @@ export default function AssessmentSection() {
 
     try {
       const response = await axiosInstance.post(
-        "/autism/contact/create",
+        "/adult-contact/create",
         formData
       );
 

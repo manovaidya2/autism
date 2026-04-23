@@ -176,18 +176,7 @@ export default function BlogDetails() {
         ></div>
       </div>
 
-      {/* Back Button */}
-      <div className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <Link
-            to="/adult-blog"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-700 transition-colors group"
-          >
-            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-            <span>Back to Blog</span>
-          </Link>
-        </div>
-      </div>
+    
 
       {/* Hero Section */}
       <div className="relative h-[400px] md:h-[500px] overflow-hidden">

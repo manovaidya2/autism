@@ -63,18 +63,18 @@ const Sidebar = () => {
       ],
       type: "dropdown",
     },
-    {
-      id: "adult",
-      icon: <FaUsers />,
-      label: "Adult Mental Health",
-      iconColor: "text-purple-400",
-      submenu: [
-        { label: "Blogs", path: "/admin/adult-blog", icon: <FaClipboardList /> },
-        { label: "Self-Help", path: "/admin-adult-selfhelp", icon: <GiHeartPlus /> },
-        { label: "Support Groups", path: "/admin-adult-support", icon: <FaUsers /> },
-      ],
-      type: "dropdown",
-    },
+ {
+  id: "adult",
+  icon: <FaUsers />,
+  label: "Adult Mental Health",
+  iconColor: "text-purple-400",
+  submenu: [
+    { label: "Blogs", path: "/admin/adult-blog", icon: <FaClipboardList /> },
+    { label: "Contact", path: "/admin/adult-contacts", icon: <GiHeartPlus /> },
+    { label: "Support Groups", path: "/admin-adult-support", icon: <FaUsers /> },
+  ],
+  type: "dropdown",
+},
     {
       id: "assessments",
       icon: <FaClipboardList />,

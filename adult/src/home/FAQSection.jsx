@@ -123,7 +123,7 @@ export default function TeenFAQSection() {
     setSubmitError("");
 
     try {
-      const response = await axiosInstance.post("/teenage/contact/create", formData);
+      const response = await axiosInstance.post("/adult-contact/create", formData);
 
       if (response.data.success) {
         setIsSubmitted(true);

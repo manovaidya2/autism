@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, User, FileText, AlertCircle, CheckCircle } from 'lucide-react';
-import axiosInstance from '../api/axiosInstance'; // Adjust the path as needed
+import axiosInstance from '../api/axiosInstance';
 
-const ContactForm = () => {
+const AdultContactForm = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -34,7 +34,6 @@ const ContactForm = () => {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
-    // Clear submit error when user starts typing
     if (submitError) setSubmitError('');
   };
 
@@ -51,13 +50,14 @@ const ContactForm = () => {
     setSubmitError('');
 
     try {
-      const response = await axiosInstance.post('/autism/contact/create', formData);
+      // Updated API endpoint for adult contact
+      const response = await axiosInstance.post('/adult-contact/create', formData);
       
-      if (response.data.success || response.status === 200 || response.status === 201) {
+      if (response.data.success) {
         setIsSubmitted(true);
         
         // Store form data in localStorage for payment page if needed
-        localStorage.setItem("contactFormData", JSON.stringify({
+        localStorage.setItem("adultContactFormData", JSON.stringify({
           fullName: formData.fullName,
           email: formData.email,
           phone: formData.phone,
@@ -75,7 +75,7 @@ const ContactForm = () => {
         // Redirect to payment link after successful submission
         setTimeout(() => {
           window.location.href = "https://rzp.io/rzp/ZQr39j1";
-        }, 1500); // 1.5 second delay to show success message
+        }, 1500);
       } else {
         setSubmitError(response.data.message || 'Failed to send message. Please try again.');
       }
@@ -83,12 +83,9 @@ const ContactForm = () => {
       console.error('Error submitting form:', err);
       
       if (err.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.error('Error response data:', err.response.data);
-        console.error('Error response status:', err.response.status);
-        
-        if (err.response.status === 400) {
+        if (err.response.status === 429) {
+          setSubmitError('Too many requests. Please try again later.');
+        } else if (err.response.status === 400) {
           setSubmitError(err.response.data.message || 'Invalid form data. Please check your inputs.');
         } else if (err.response.status === 500) {
           setSubmitError('Server error. Please try again later.');
@@ -96,10 +93,8 @@ const ContactForm = () => {
           setSubmitError(err.response.data.message || 'Failed to send message. Please try again.');
         }
       } else if (err.request) {
-        // The request was made but no response was received
         setSubmitError('No response from server. Please check your internet connection.');
       } else {
-        // Something happened in setting up the request that triggered an Error
         setSubmitError('An error occurred. Please try again.');
       }
     } finally {
@@ -110,21 +105,21 @@ const ContactForm = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        {/* Header Section - Compact */}
+        {/* Header Section */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center p-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-md mb-3">
             <Mail className="w-6 h-6 text-white" />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-2">
-            Get in Touch
+            Adult Contact Form
           </h1>
           <p className="text-slate-600 max-w-2xl mx-auto text-sm">
-            We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+            Please fill out this form to get in touch with our team. We'll respond as soon as possible.
           </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6">
-          {/* Contact Info Cards - Compact */}
+          {/* Contact Info Cards */}
           <div className="space-y-4">
             <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md p-4 border border-white/50 hover:shadow-lg transition-all duration-300">
               <div className="flex items-center space-x-3">
@@ -134,7 +129,7 @@ const ContactForm = () => {
                 <div>
                   <h3 className="text-lg font-semibold text-slate-800">Phone</h3>
                   <p className="text-slate-600 text-medium">+91-7823838638</p>
-                  <p className="text-medium text-slate-400">Mon-Fri 11am-7pm </p>
+                  <p className="text-medium text-slate-400">Mon-Fri 11am-7pm</p>
                 </div>
               </div>
             </div>
@@ -172,25 +167,10 @@ const ContactForm = () => {
                 </div>
               </div>
             </div>
-
-            {/* Mini Map Preview */}
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-md p-3 text-white overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/20 rounded-full blur-xl"></div>
-              <div className="relative z-10">
-                <div className="flex items-center space-x-1 mb-2">
-                  <MapPin className="w-3 h-3 text-blue-400" />
-                  <span className="text-xs font-medium">Find us here</span>
-                </div>
-                <div className="h-12 bg-slate-700/50 rounded-lg flex items-center justify-center">
-                  <p className="text-[10px] text-slate-300">📍 Interactive Map Preview</p>
-                </div>
-              </div>
-            </div>
           </div>
 
-          {/* Form Section - Compact Two-Row Layout */}
+          {/* Form Section */}
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            {/* Success Message */}
             {isSubmitted && (
               <div className="m-4 mb-0 bg-emerald-50 border border-emerald-200 rounded-lg p-3 flex items-center space-x-2 animate-in slide-in-from-top-2 duration-300">
                 <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />
@@ -198,7 +178,6 @@ const ContactForm = () => {
               </div>
             )}
 
-            {/* Error Message */}
             {submitError && (
               <div className="m-4 mb-0 bg-red-50 border border-red-200 rounded-lg p-3 flex items-center space-x-2 animate-in slide-in-from-top-2 duration-300">
                 <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
@@ -207,7 +186,6 @@ const ContactForm = () => {
             )}
             
             <form onSubmit={handleSubmit} className="p-5 space-y-4">
-              {/* Row 1: Full Name + Email */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">
@@ -222,7 +200,7 @@ const ContactForm = () => {
                     value={formData.fullName}
                     onChange={handleChange}
                     className={`w-full px-3 py-2 text-sm border ${errors.fullName ? 'border-red-400 bg-red-50' : 'border-slate-200'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
-                    placeholder="Manovaidya Ayurveda"
+                    placeholder="Enter your full name"
                   />
                   {errors.fullName && (
                     <p className="mt-1 text-xs text-red-500 flex items-center space-x-1">
@@ -245,7 +223,7 @@ const ContactForm = () => {
                     value={formData.email}
                     onChange={handleChange}
                     className={`w-full px-3 py-2 text-sm border ${errors.email ? 'border-red-400 bg-red-50' : 'border-slate-200'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
-                    placeholder="info@manovaidya.help"
+                    placeholder="your@email.com"
                   />
                   {errors.email && (
                     <p className="mt-1 text-xs text-red-500 flex items-center space-x-1">
@@ -256,7 +234,6 @@ const ContactForm = () => {
                 </div>
               </div>
 
-              {/* Row 2: Phone + Address */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">
@@ -271,7 +248,7 @@ const ContactForm = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     className={`w-full px-3 py-2 text-sm border ${errors.phone ? 'border-red-400 bg-red-50' : 'border-slate-200'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
-                    placeholder="+91 7823838638"
+                    placeholder="+91 XXXXX XXXXX"
                   />
                   {errors.phone && (
                     <p className="mt-1 text-xs text-red-500 flex items-center space-x-1">
@@ -294,7 +271,7 @@ const ContactForm = () => {
                     value={formData.address}
                     onChange={handleChange}
                     className={`w-full px-3 py-2 text-sm border ${errors.address ? 'border-red-400 bg-red-50' : 'border-slate-200'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
-                    placeholder="VS Plaza, near Vinayak Hospital, Noida"
+                    placeholder="Your full address"
                   />
                   {errors.address && (
                     <p className="mt-1 text-xs text-red-500 flex items-center space-x-1">
@@ -305,7 +282,6 @@ const ContactForm = () => {
                 </div>
               </div>
 
-              {/* Message Field - Full Width, Compact Height */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   <span className="flex items-center space-x-1.5">
@@ -319,7 +295,7 @@ const ContactForm = () => {
                   value={formData.message}
                   onChange={handleChange}
                   className={`w-full px-3 py-2 text-sm border ${errors.message ? 'border-red-400 bg-red-50' : 'border-slate-200'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none`}
-                  placeholder="Tell us about your project, question, or feedback..."
+                  placeholder="Tell us about your inquiry..."
                 />
                 {errors.message && (
                   <p className="mt-1 text-xs text-red-500 flex items-center space-x-1">
@@ -329,7 +305,6 @@ const ContactForm = () => {
                 )}
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -362,4 +337,4 @@ const ContactForm = () => {
   );
 };
 
-export default ContactForm;
+export default AdultContactForm;

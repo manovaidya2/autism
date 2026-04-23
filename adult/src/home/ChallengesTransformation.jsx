@@ -145,7 +145,7 @@ export default function ChallengeSection() {
     };
 
     try {
-      const response = await axiosInstance.post("/mental-health/consultation/create", submitData);
+      const response = await axiosInstance.post("/adult-contact/create", submitData);
 
       if (response.data.success || response.status === 200 || response.status === 201) {
         setIsSubmitted(true);
@@ -169,7 +169,7 @@ export default function ChallengeSection() {
 
         // Redirect to payment link after successful submission
         setTimeout(() => {
-          window.location.href = "https://rzp.io/rzp/mentalhealthsupport";
+          window.location.href = "https://rzp.io/rzp/ZQr39j1";
         }, 1500); // 1.5 second delay to show success message
       } else {
         setSubmitError(response.data.message || "Failed to submit form.");

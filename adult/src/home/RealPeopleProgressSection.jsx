@@ -135,9 +135,9 @@ const RealPeopleProgressWithForm = () => {
 
     try {
       const response = await axiosInstance.post(
-        "/mental-health/consultation/create",
+        "/adult-contact/create",
         formData
-      );
+      );  
 
       if (
         response.data.success ||
@@ -165,7 +165,7 @@ const RealPeopleProgressWithForm = () => {
         });
 
         setTimeout(() => {
-          window.location.href = "https://rzp.io/rzp/mentalhealthsupport";
+          window.location.href = "https://rzp.io/rzp/ZQr39j1";
         }, 1500);
       } else {
         setSubmitError(response.data.message || "Failed to submit form.");

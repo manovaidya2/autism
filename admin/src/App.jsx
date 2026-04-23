@@ -14,6 +14,7 @@ import TeenageContact from "./teenage/TeenageContact";
 import AdultBlog from "./adult/AdultBlog";
 import AdultBlogDashboard from "./adult/AdultBlogDashboard";
 import AdultBlogForm from "./adult/AdultBlogForm";
+import AdminAdultContacts from "./adult/AdminAdultContacts";
 
 
 
@@ -38,6 +39,8 @@ function App() {
            <Route path = "/teenage-contact" element={<Layout><TeenageContact/></Layout>} />
            <Route path="/admin/adult-blog/edit/:id" element={<Layout><AdultBlogForm /></Layout>} />
            <Route path="/admin/adult-blog" element={<Layout><AdultBlogDashboard /></Layout>} />
+        <Route path="/admin/adult-contacts" element={<Layout><AdminAdultContacts /></Layout>} />
+
 
          
     
