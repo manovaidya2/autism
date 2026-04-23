@@ -91,7 +91,7 @@ export default function BlogPage() {
     setSubmitError("");
 
     try {
-      const response = await axiosInstance.post("/mental-health/consultation/create", formData);
+      const response = await axiosInstance.post("/adult-contact/create", formData);
 
       if (response.data.success || response.status === 200 || response.status === 201) {
         setIsSubmitted(true);
@@ -112,7 +112,7 @@ export default function BlogPage() {
         });
 
         setTimeout(() => {
-          window.location.href = "https://rzp.io/rzp/mentalhealthsupport";
+          window.location.href = "https://rzp.io/rzp/ZQr39j1";
         }, 1500);
       } else {
         setSubmitError(response.data.message || "Failed to submit form.");

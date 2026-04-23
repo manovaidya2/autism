@@ -27,12 +27,12 @@ export default function Home() {
   
       <Hero />
       <ChallengesTransformation />
+      <AdultMentalHealthSection />
       <UnderstandingSection />
       <MythsFacts />
       <SymptomsConnectedSection />
       {/* <ScienceSection /> */}
       <StructuredScienceSystemSection />
-      <AdultMentalHealthSection />
       <CommonAdultConcernsSection />
       <RealPeopleProgressSection />
 

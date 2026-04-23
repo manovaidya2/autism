@@ -26,10 +26,11 @@ const stories = [
       "Digestion stable, no more daily acidity",
     ],
     quote:
-      "I was on the verge of quitting my job. The exhaustion was bone-deep and no amount of weekend rest helped. Within 4 months of the Manovaidya program, I felt like a different person. They didn’t just give me coping techniques — they fixed what was broken inside.",
-    name: "Rahul Mehta",
-    role: "Senior Marketing Manager, Age 38",
-    timeline: "4 months into program",
+      "I was on the verge of quitting my job. The exhaustion was bone-deep and no amount of weekend rest helped. Within 4 months of the Manovaidya program, I felt like a different person. They didn't just give me coping techniques — they fixed what was broken inside.",
+    name: "Rohan sharma ",
+    role: "jaipur, Age 30",
+    timeline: "3 months into program",
+    videoEmbedCode: "https://www.youtube.com/embed/rBOGwlYSfUY?si=nfGXzk3Kx4XoVOSm",
   },
   {
     before: [
@@ -45,12 +46,14 @@ const stories = [
       "Healthy weight, balanced digestion",
     ],
     quote:
-      "I’d tried therapy, meditation apps, and medication. Nothing addressed why I felt so chemically off. The Manovaidya approach worked because they fixed my gut and nervous system first. The mental peace followed naturally.",
-    name: "Priyanka Sharma",
-    role: "Working Mother & HR Director, Age 41",
-    timeline: "5 months into program",
+      "I'd tried therapy, meditation apps, and medication. Nothing addressed why I felt so chemically off. The Manovaidya approach worked because they fixed my gut and nervous system first. The mental peace followed naturally.",
+    name: "Ankit verma ",
+    role: "Delhi, Age 40",
+    timeline: "3 months into program",
+    videoEmbedCode: "https://www.youtube.com/embed/oWMqqacIIpQ?si=TY2zgvD54lLr4soj",
   },
-  {
+
+  {            
     before: [
       "Panic attacks at work, hiding in the bathroom",
       "Complete loss of motivation and joy",
@@ -64,10 +67,11 @@ const stories = [
       "Reconnected with friends, started hobbies again",
     ],
     quote:
-      "I thought I was having heart problems. Multiple doctors confirmed it was anxiety, but no one could tell me how to actually fix it. Manovaidya’s structured root-cause approach gave me my life back. I wish I’d found them years ago.",
+      "I thought I was having heart problems. Multiple doctors confirmed it was anxiety, but no one could tell me how to actually fix it. Manovaidya's structured root-cause approach gave me my life back. I wish I'd found them years ago.",
     name: "Arjun Kapoor",
     role: "Software Engineer & Father, Age 35",
     timeline: "6 months into program",
+    videoEmbedCode: "https://www.youtube.com/embed/1V_xRb0x9a2w",
   },
 ];
 
@@ -211,6 +215,19 @@ const RealPeopleProgressWithForm = () => {
                   key={index}
                   className="overflow-hidden rounded-[20px] border border-[#d9def8] bg-white"
                 >
+                  {/* Video Player with different embed code for each card */}
+                  <div className="relative bg-black w-full">
+                    <iframe
+                      className="w-full aspect-video"
+                      src={story.videoEmbedCode}
+                      title={`Success Story - ${story.name}`}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allowFullScreen
+                    />
+                  </div>
+
                   {/* Top comparison */}
                   <div className="grid md:grid-cols-2">
                     {/* Before */}

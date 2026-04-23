@@ -1,39 +1,40 @@
+// File: PillarSection.jsx
 import React from "react";
 import {
   FaBrain,
+  FaBalanceScale,
+  FaBed,
 } from "react-icons/fa";
 import { GiStomach } from "react-icons/gi";
-import { IoGitNetworkOutline } from "react-icons/io5";
-import { MdOutlinePanTool } from "react-icons/md";
-import { AiOutlineLineChart } from "react-icons/ai";
+import { IoBodyOutline } from "react-icons/io5";
 import { FiArrowRight } from "react-icons/fi";
 
 export default function PillarSection() {
   const data = [
     {
       icon: <FaBrain />,
-      title: "Brain Nourishment",
-      desc: "Targeted micro-nutrition, omega-3 fatty acids, and brain-specific supplements that support neuronal growth, myelination, and synaptic plasticity in developing brains.",
+      title: "Brain Chemistry Balance",
+      desc: "Targeted nutritional support, neurotransmitter optimization, and brain-specific nutrients that restore chemical balance, improve mood regulation, and enhance cognitive function.",
     },
     {
       icon: <GiStomach />,
-      title: "Gut Healing Protocol",
-      desc: "Restoring the gut-brain axis through probiotic therapy, anti-inflammatory nutrition, and gut lining repair — because 70% of neurotransmitters are produced in the gut.",
+      title: "Gut-Brain Axis Restoration",
+      desc: "Healing the gut microbiome, reducing inflammation, and repairing intestinal lining — because 90% of serotonin and 50% of dopamine are produced in the gut, directly affecting mood and mental clarity.",
     },
     {
-      icon: <IoGitNetworkOutline />,
-      title: "Neural Network Activation",
-      desc: "Structured exercises and therapies designed to stimulate dormant neural pathways, strengthen weak connections, and build new brain circuits for processing and response.",
+      icon: <IoBodyOutline />,
+      title: "Nervous System Regulation",
+      desc: "Resetting the autonomic nervous system from chronic 'fight or flight' to a balanced state of rest and recovery — reducing anxiety, improving sleep, and restoring emotional resilience.",
     },
     {
-      icon: <MdOutlinePanTool />,
-      title: "Sensory–Motor Integration",
-      desc: "Systematic desensitization, proprioceptive input, and motor planning activities that help the brain process sensory information without overwhelm.",
+      icon: <FaBed />,
+      title: "Sleep & Circadian Repair",
+      desc: "Restoring healthy sleep architecture through cortisol management, melatonin regulation, and circadian rhythm optimization — because poor sleep is both a cause and effect of chronic stress.",
     },
     {
-      icon: <AiOutlineLineChart />,
-      title: "Behaviour & Communication Alignment",
-      desc: "Building positive behavior patterns, functional communication skills, and social understanding through structured, evidence-based support systems.",
+      icon: <FaBalanceScale />,
+      title: "Stress Resilience Training",
+      desc: "Building sustainable coping mechanisms, emotional regulation skills, and mindset shifts that rewire the brain's response to stress — turning reactive patterns into resilient responses.",
     },
   ];
 
@@ -48,8 +49,8 @@ export default function PillarSection() {
 
         {/* Subtitle */}
         <p className="text-[14px] sm:text-[16px] text-[#6b7a90] max-w-[750px] mx-auto mb-8 sm:mb-12 leading-relaxed">
-          A structured, phase-wise neurodevelopment system that addresses the
-          root causes — not just the symptoms — of autism and ADHD.
+          A structured, root-cause approach to adult mental wellness that addresses
+          the biological foundations — not just the symptoms — of stress, anxiety, and burnout.
         </p>
 
         {/* Cards */}
@@ -79,11 +80,10 @@ export default function PillarSection() {
 
         {/* Bottom Text */}
         <p className="text-[15px] sm:text-[20px] text-[#6b7a90] max-w-[1200px] mx-auto mb-5 sm:mb-6 leading-relaxed">
-          Each pillar builds upon the previous one, creating a comprehensive
+          Each pillar addresses a specific biological root cause, creating a comprehensive
           system that{" "}
           <span className="font-bold text-[#1f2b3f]">
-            prepares the brain for therapy, accelerates progress, and sustains
-            improvements long-term.
+            restores balance from the inside out, builds lasting resilience, and helps you reclaim your energy, focus, and peace of mind.
           </span>
         </p>
 

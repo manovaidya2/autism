@@ -1,6 +1,6 @@
 import React from "react";
 import { FaCheckCircle } from "react-icons/fa";
-import imghero from "../images/hero.jpeg";
+import imghero from "../images/adult.jpeg";
 
 export default function HeroSection() {
   return (
