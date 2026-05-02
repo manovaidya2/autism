@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Blog from "../models/Blog.js";
 
 // CREATE
@@ -63,11 +64,24 @@ export const createBlog = async (req, res) => {
 // GET ALL
 export const getBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find().sort({ createdAt: -1 });
-    res.json(blogs);
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: "Database not connected",
+      });
+    }
+
+    const blogs = await Blog.find({})
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.status(200).json(blogs);
   } catch (error) {
     console.error("Error fetching blogs:", error);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server Error",
+    });
   }
 };
 
