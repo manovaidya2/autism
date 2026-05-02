@@ -72,7 +72,9 @@ export const getBlogs = async (req, res) => {
     }
 
     const blogs = await Blog.find({})
+      .select("title slug author category date image shortDescription createdAt")
       .sort({ createdAt: -1 })
+      .limit(200)
       .lean();
 
     res.status(200).json(blogs);
@@ -84,7 +86,6 @@ export const getBlogs = async (req, res) => {
     });
   }
 };
-
 // GET BY ID
 export const getBlogById = async (req, res) => {
   try {
