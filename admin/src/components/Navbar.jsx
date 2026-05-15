@@ -324,7 +324,7 @@ const Navbar = () => {
   return (
     <>
       {/* Top Navbar (Sticky) */}
-      <nav className="bg-gradient-to-r from-blue-900 to-indigo-900 p-4 md:p-6 text-white flex justify-between items-center md:ml-64 fixed top-0 left-0 right-0 z-40 shadow-lg">
+      <nav className="bg-[#06351f] p-4 md:p-6 text-white flex justify-between items-center md:ml-64 fixed top-0 left-0 right-0 z-40 shadow-lg">
         
         {/* Left: Menu + Logo */}
         <div className="flex items-center gap-4">
@@ -335,11 +335,11 @@ const Navbar = () => {
           >
             <FaBars />
           </button>
-          <img
+          {/* <img
             src={logo}
             alt="Autism Care Dashboard"
             className="w-40 h-10 object-contain"
-          />
+          /> */}
         </div>
 
         {/* Right: Notifications + Profile + Logout */}

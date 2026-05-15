@@ -76,19 +76,19 @@ const Sidebar = () => {
   type: "dropdown",
 },
     {
-      id: "assessments",
+      id: "VSL Landing Page",
       icon: <FaClipboardList />,
-      label: "Assessments",
-      path: "/assessments",
+      label: " Autism VSL Landing Page",
+      path: "/autism-booking-vsl",
       type: "link",
       badge: "New",
       iconColor: "text-yellow-400",
     },
     {
-      id: "gallery",
+      id: "Autism Landing Page",
       icon: <FaImages />,
-      label: "Activity Gallery",
-      path: "/gallery",
+      label: "Autism Landing Page",
+      path: "/autism-landingpage",
       type: "link",
       iconColor: "text-orange-400",
     },
@@ -103,7 +103,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="relative w-72 bg-gradient-to-b from-slate-900 via-blue-900 to-indigo-900 text-white h-screen flex flex-col shadow-2xl">
+    <div className="relative w-72 bg-[#06351f] text-white h-screen flex flex-col shadow-2xl">
       {/* Decorative Background Elements - Removed animations */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-20 -left-20 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>

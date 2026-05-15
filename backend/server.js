@@ -9,7 +9,8 @@ import adultBlogRoutes from "./routes/adultBlogRoutes.js";
 import autismRoutes from "./routes/autismContactRoutes.js";
 import teenageContactRoutes from './routes/teenageContactRoutes.js'; 
 import adultContactRoutes from './routes/adultContactRoutes.js';
-
+import bookingRoutes from "./routes/bookingRoutes.js";
+import autismBookingRoutes from './routes/autismBookingRoutes.js';
 
       const app = express();
 
@@ -38,6 +39,8 @@ app.use("/api/adultblog", adultBlogRoutes);
 app.use("/api/autism/contact", autismRoutes);
 app.use('/api', teenageContactRoutes);
 app.use('/api/adult-contact', adultContactRoutes);
+app.use("/api/bookings", bookingRoutes);
+app.use('/api', autismBookingRoutes);
 
 
 

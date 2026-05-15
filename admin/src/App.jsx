@@ -15,6 +15,8 @@ import AdultBlog from "./adult/AdultBlog";
 import AdultBlogDashboard from "./adult/AdultBlogDashboard";
 import AdultBlogForm from "./adult/AdultBlogForm";
 import AdminAdultContacts from "./adult/AdminAdultContacts";
+import AdminBookings from "./components/AdminBookings";
+import AutismBookingsAdmin from "./pages/AutismBookingsAdmin";
 
 
 
@@ -40,6 +42,8 @@ function App() {
            <Route path="/admin/adult-blog/edit/:id" element={<Layout><AdultBlogForm /></Layout>} />
            <Route path="/admin/adult-blog" element={<Layout><AdultBlogDashboard /></Layout>} />
         <Route path="/admin/adult-contacts" element={<Layout><AdminAdultContacts /></Layout>} />
+        <Route path="/autism-booking-vsl" element={<Layout><AdminBookings  /></Layout>} />
+        <Route path="/autism-landingpage" element={<Layout><AutismBookingsAdmin /></Layout>} />
 
 
          

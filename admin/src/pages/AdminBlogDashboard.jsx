@@ -154,7 +154,7 @@ export default function AdminBlogDashboard() {
 
   return (
     <section className="p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Blog Management Dashboard</h1>
