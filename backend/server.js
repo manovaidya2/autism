@@ -12,6 +12,7 @@ import adultContactRoutes from './routes/adultContactRoutes.js';
 import bookingRoutes from "./routes/bookingRoutes.js";
 import autismBookingRoutes from './routes/autismBookingRoutes.js';
 import krayaLeadRoutes from "./routes/krayaLeadRoutes.js";
+import autismKrayaRoutes from "./routes/autismKrayaRoutes.js";
 
 
 
@@ -45,6 +46,7 @@ app.use('/api/adult-contact', adultContactRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use('/api', autismBookingRoutes);
 app.use("/api", krayaLeadRoutes);
+app.use("/api", autismKrayaRoutes);
 
 
 
