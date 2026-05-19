@@ -8,12 +8,16 @@ import {
   Clock as ClockIcon,
   Video,
   Building,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import axios from "../api/axiosInstance";
 
 export default function BookingModal({ open, setOpen }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [showCalendar, setShowCalendar] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -35,6 +39,124 @@ export default function BookingModal({ open, setOpen }) {
     "11:50-12:00 PM",
   ];
 
+  // Allowed days: Tuesday (2), Thursday (4), Saturday (6)
+  const allowedDays = [2, 4, 6];
+
+  // Check if a date is allowed (Tuesday, Thursday, or Saturday)
+  const isDateAllowed = (date) => {
+    const dayOfWeek = date.getDay();
+    return allowedDays.includes(dayOfWeek);
+  };
+
+  // Get available dates for display
+  const getAvailableDatesDisplay = () => {
+    const dates = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    for (let i = 0; i < 30; i++) {
+      const checkDate = new Date(today);
+      checkDate.setDate(today.getDate() + i);
+      if (isDateAllowed(checkDate)) {
+        dates.push(checkDate);
+        if (dates.length >= 6) break;
+      }
+    }
+    
+    return dates;
+  };
+
+  // Generate calendar days for current month
+  const getCalendarDays = () => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+    
+    const startingDayOfWeek = firstDayOfMonth.getDay();
+    const daysInMonth = lastDayOfMonth.getDate();
+    
+    const calendarDays = [];
+    
+    // Add empty cells for days before month starts
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      calendarDays.push(null);
+    }
+    
+    // Add days of the month
+    for (let i = 1; i <= daysInMonth; i++) {
+      const date = new Date(year, month, i);
+      calendarDays.push(date);
+    }
+    
+    return calendarDays;
+  };
+
+  // Format date for display
+  const formatDate = (date) => {
+    if (!date) return "";
+    const day = date.getDate();
+    const month = date.toLocaleString('default', { month: 'short' });
+    const year = date.getFullYear();
+    return `${day} ${month}, ${year}`;
+  };
+
+  // Format date for API (YYYY-MM-DD)
+  const formatDateForAPI = (date) => {
+    if (!date) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // Get day name
+  const getDayName = (date) => {
+    if (!date) return "";
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return days[date.getDay()];
+  };
+
+  // Handle date selection
+  const handleDateSelect = (date) => {
+    if (date && isDateAllowed(date)) {
+      setFormData(prev => ({
+        ...prev,
+        date: formatDateForAPI(date)
+      }));
+      setShowCalendar(false);
+      if (errors.date) {
+        setErrors(prev => ({ ...prev, date: "" }));
+      }
+    }
+  };
+
+  // Navigate to previous month
+  const prevMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+  };
+
+  // Navigate to next month
+  const nextMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+  };
+
+  // Check if date is today
+  const isToday = (date) => {
+    if (!date) return false;
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear();
+  };
+
+  // Check if date is selected
+  const isSelected = (date) => {
+    if (!date || !formData.date) return false;
+    return formatDateForAPI(date) === formData.date;
+  };
+
   // Prevent body scroll
   useEffect(() => {
     if (open) {
@@ -47,6 +169,18 @@ export default function BookingModal({ open, setOpen }) {
       document.body.style.overflow = "unset";
     };
   }, [open]);
+
+  // Close calendar when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showCalendar && !e.target.closest('.calendar-container')) {
+        setShowCalendar(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showCalendar]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -68,7 +202,13 @@ export default function BookingModal({ open, setOpen }) {
     }
 
     if (!formData.date) {
-      newErrors.date = "Date is required";
+      newErrors.date = "Date is required (Tuesday, Thursday, or Saturday only)";
+    } else {
+      // Validate that selected date is actually allowed
+      const selectedDate = new Date(formData.date);
+      if (!isDateAllowed(selectedDate)) {
+        newErrors.date = "Please select a Tuesday, Thursday, or Saturday";
+      }
     }
 
     if (!formData.time) {
@@ -152,10 +292,7 @@ export default function BookingModal({ open, setOpen }) {
     }
   };
 
-  const getMinDate = () => {
-    const today = new Date();
-    return today.toISOString().split("T")[0];
-  };
+  const availableDates = getAvailableDatesDisplay();
 
   if (!open) return null;
 
@@ -187,7 +324,7 @@ export default function BookingModal({ open, setOpen }) {
           </h3>
 
           <p className="mt-2 text-[14px] text-[#6b756c]">
-            Fill the details below and proceed to payment.
+            Fill the details below and proceed to payment. Available on <span className="font-semibold">Tuesdays, Thursdays & Saturdays</span> only.
           </p>
 
           {/* Error */}
@@ -285,22 +422,22 @@ export default function BookingModal({ open, setOpen }) {
                 )}
               </div>
 
-              {/* Date */}
-              <div>
+              {/* Date with Custom Calendar */}
+              <div className="calendar-container relative">
                 <label className="mb-2 block text-sm font-semibold text-[#193b2b]">
-                  Select Date
+                  Select Date (Tue, Thu, Sat only)
                 </label>
 
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6b756c]" />
-
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6b756c] z-10" />
+                  
                   <input
-                    type="date"
-                    name="date"
-                    value={formData.date}
-                    onChange={handleChange}
-                    min={getMinDate()}
-                    className={`w-full rounded-2xl border px-10 py-3 text-sm outline-none transition-all focus:border-[#d6a22e] ${
+                    type="text"
+                    placeholder="Select a date"
+                    value={formData.date ? `${formatDate(new Date(formData.date))} (${getDayName(new Date(formData.date))})` : ""}
+                    onFocus={() => setShowCalendar(true)}
+                    readOnly
+                    className={`w-full rounded-2xl border px-10 py-3 text-sm outline-none transition-all focus:border-[#d6a22e] cursor-pointer ${
                       errors.date
                         ? "border-red-400 bg-red-50"
                         : "border-[#e5ddcf] bg-[#fbfaf7]"
@@ -308,9 +445,108 @@ export default function BookingModal({ open, setOpen }) {
                   />
                 </div>
 
+                {/* Custom Calendar Dropdown */}
+                {showCalendar && (
+                  <div className="absolute z-20 mt-2 w-full bg-white rounded-2xl border border-[#e5ddcf] shadow-xl p-4" style={{ minWidth: '280px' }}>
+                    {/* Calendar Header */}
+                    <div className="flex items-center justify-between mb-4">
+                      <button
+                        type="button"
+                        onClick={prevMonth}
+                        className="p-1 hover:bg-[#f5f2ea] rounded-full transition-colors"
+                      >
+                        <ChevronLeft className="w-5 h-5 text-[#0b2f1d]" />
+                      </button>
+                      
+                      <span className="font-semibold text-[#0b2f1d]">
+                        {currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                      </span>
+                      
+                      <button
+                        type="button"
+                        onClick={nextMonth}
+                        className="p-1 hover:bg-[#f5f2ea] rounded-full transition-colors"
+                      >
+                        <ChevronRight className="w-5 h-5 text-[#0b2f1d]" />
+                      </button>
+                    </div>
+
+                    {/* Day Headers */}
+                    <div className="grid grid-cols-7 gap-1 mb-2">
+                      {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
+                        <div key={day} className="text-center text-xs font-medium text-[#6b756c] py-2">
+                          {day}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Calendar Days */}
+                    <div className="grid grid-cols-7 gap-1">
+                      {getCalendarDays().map((date, index) => {
+                        if (!date) {
+                          return <div key={`empty-${index}`} className="p-2"></div>;
+                        }
+                        
+                        const allowed = isDateAllowed(date);
+                        const selected = isSelected(date);
+                        const today = isToday(date);
+                        
+                        return (
+                          <button
+                            key={date.toISOString()}
+                            type="button"
+                            onClick={() => handleDateSelect(date)}
+                            disabled={!allowed}
+                            className={`
+                              p-2 text-center rounded-xl transition-all text-sm font-medium
+                              ${!allowed && 'opacity-30 cursor-not-allowed bg-gray-100 text-gray-400'}
+                              ${allowed && !selected && 'hover:bg-[#d6a22e]/20 cursor-pointer text-[#0b2f1d]'}
+                              ${selected && 'bg-[#d6a22e] text-white font-semibold shadow-md'}
+                              ${today && !selected && allowed && 'border-2 border-[#d6a22e] bg-[#d6a22e]/5'}
+                            `}
+                          >
+                            {date.getDate()}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Legend */}
+                    <div className="mt-4 pt-3 border-t border-[#e5ddcf] flex items-center justify-center gap-4 text-xs">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-3 h-3 rounded-full bg-[#d6a22e]"></div>
+                        <span className="text-[#6b756c]">Available (Tue, Thu, Sat)</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-3 h-3 rounded-full bg-gray-200"></div>
+                        <span className="text-[#6b756c]">Not Available</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {errors.date && (
                   <p className="mt-1 text-[11px] text-red-500">{errors.date}</p>
                 )}
+                
+                {/* Show available dates hint */}
+                {/* {availableDates.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-[11px] text-[#6b756c] font-medium mb-1">Next available dates:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {availableDates.map((date, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => handleDateSelect(date)}
+                          className="text-xs px-2 py-1 rounded-lg bg-[#f5f2ea] text-[#0b2f1d] hover:bg-[#d6a22e]/20 transition-colors"
+                        >
+                          {formatDate(date)} ({getDayName(date)})
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )} */}
               </div>
 
               {/* Mode Selection - Full width */}
