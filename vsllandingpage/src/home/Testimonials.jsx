@@ -5,8 +5,8 @@ import {
   Star,
 } from "lucide-react";
 
-import pradeepImg from "../images/imghero.jpeg";
-import jatinImg from "../images/imghero.jpeg";
+import pradeepImg from "../images/ankur.jpeg";
+import jatinImg from "../images/dj.jpeg";
 
 export default function Testimonials() {
 
