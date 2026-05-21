@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ArrowRight, Lock, CheckCircle, Play } from "lucide-react";
+import { ArrowRight, Lock, CheckCircle, Play, Rewind, FastForward } from "lucide-react";
 import img from "../images/3.jpg.jpeg";
 
 export default function VSL() {
   const videoRef = useRef(null);
   const maxWatchedTime = useRef(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showSpeedControl, setShowSpeedControl] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
 
   const STORAGE_KEY = "vsl_lesson_1_progress";
 
@@ -37,14 +39,11 @@ export default function VSL() {
     const handleTimeUpdate = () => {
       if (!video) return;
 
-      if (video.currentTime > maxWatchedTime.current + 1) {
-        video.currentTime = maxWatchedTime.current;
-        return;
+      // Update max watched time (only forward progress)
+      if (video.currentTime > maxWatchedTime.current) {
+        maxWatchedTime.current = video.currentTime;
+        localStorage.setItem(STORAGE_KEY, String(video.currentTime));
       }
-
-      maxWatchedTime.current = video.currentTime;
-
-      localStorage.setItem(STORAGE_KEY, String(video.currentTime));
 
       const current = video.currentTime;
       const duration = video.duration;
@@ -59,11 +58,25 @@ export default function VSL() {
       }
     };
 
-    const preventSeek = () => {
+    const preventSeekForward = () => {
       if (!video) return;
 
-      if (video.currentTime > maxWatchedTime.current) {
+      // If trying to seek forward beyond max watched time, prevent it
+      if (video.currentTime > maxWatchedTime.current + 0.5) {
         video.currentTime = maxWatchedTime.current;
+      }
+      // Allow seeking backward without any issue (no pause)
+    };
+
+    // Handle seeking events without pausing
+    const handleSeeking = () => {
+      preventSeekForward();
+    };
+
+    const handleSeeked = () => {
+      // Ensure video continues playing if it was playing before seek
+      if (isPlaying && video.paused) {
+        video.play().catch(err => console.log("Play prevented:", err));
       }
     };
 
@@ -73,7 +86,8 @@ export default function VSL() {
 
     video.addEventListener("loadedmetadata", handleLoadedMetadata);
     video.addEventListener("timeupdate", handleTimeUpdate);
-    video.addEventListener("seeking", preventSeek);
+    video.addEventListener("seeking", handleSeeking);
+    video.addEventListener("seeked", handleSeeked);
     video.addEventListener("play", handlePlay);
     video.addEventListener("pause", handlePause);
     video.addEventListener("ended", handleEnded);
@@ -81,17 +95,50 @@ export default function VSL() {
     return () => {
       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
       video.removeEventListener("timeupdate", handleTimeUpdate);
-      video.removeEventListener("seeking", preventSeek);
+      video.removeEventListener("seeking", handleSeeking);
+      video.removeEventListener("seeked", handleSeeked);
       video.removeEventListener("play", handlePlay);
       video.removeEventListener("pause", handlePause);
       video.removeEventListener("ended", handleEnded);
     };
-  }, []);
+  }, [isPlaying]);
 
   const handlePlayClick = () => {
     if (videoRef.current) {
       videoRef.current.play();
       setIsPlaying(true);
+    }
+  };
+
+  const handleRewind = () => {
+    if (videoRef.current) {
+      const newTime = Math.max(0, videoRef.current.currentTime - 10);
+      videoRef.current.currentTime = newTime;
+      // Keep playing if it was playing
+      if (isPlaying && videoRef.current.paused) {
+        videoRef.current.play();
+      }
+    }
+  };
+
+  const handleForward = () => {
+    if (videoRef.current) {
+      const newTime = Math.min(maxWatchedTime.current, videoRef.current.currentTime + 10);
+      if (newTime <= maxWatchedTime.current) {
+        videoRef.current.currentTime = newTime;
+        // Keep playing if it was playing
+        if (isPlaying && videoRef.current.paused) {
+          videoRef.current.play();
+        }
+      }
+    }
+  };
+
+  const changePlaybackSpeed = (speed) => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = speed;
+      setPlaybackSpeed(speed);
+      setShowSpeedControl(false);
     }
   };
 
@@ -107,7 +154,6 @@ export default function VSL() {
         <div className="text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#d6a22e]/30 bg-white/70 px-4 py-2 shadow-sm">
             <span className="h-2 w-2 rounded-full bg-[#d6a22e] animate-pulse"></span>
-
             <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.28em] text-[#d6a22e] font-semibold">
               Watch First
             </p>
@@ -147,7 +193,6 @@ export default function VSL() {
                     alt="Video thumbnail"
                     className="h-full w-full object-cover"
                     onError={(e) => {
-                      // Fallback gradient if thumbnail image doesn't exist
                       const target = e.target;
                       target.style.display = 'none';
                       const parent = target.parentElement;
@@ -166,14 +211,9 @@ export default function VSL() {
                     aria-label="Play video"
                   >
                     <div className="relative">
-                      {/* Animated ring effect - Purple */}
-                      <div className="absolute inset-0 rounded-full bg-red-800 animate-ping opacity-40"></div>
-                      <div className="relative flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-red-700 shadow-xl transition-all duration-300 group-hover:scale-110 group-hover:bg-red-500">
-                        <Play
-                          size={36}
-                          className="ml-1 text-white sm:size-10"
-                          fill="white"
-                        />
+                      <div className="absolute inset-0 rounded-full bg-purple-500 animate-ping opacity-40"></div>
+                      <div className="relative flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-purple-600 shadow-xl transition-all duration-300 group-hover:scale-110 group-hover:bg-purple-700">
+                        <Play size={36} className="ml-1 text-white sm:size-10" fill="white" />
                       </div>
                     </div>
                   </button>
@@ -210,6 +250,53 @@ export default function VSL() {
               >
                 <source src="/video/lesson 1.mp4" type="video/mp4" />
               </video>
+
+              {/* Custom Controls Overlay when playing */}
+              {isPlaying && (
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 hover:opacity-100 transition-opacity duration-300 z-20">
+                  <div className="flex items-center justify-center gap-4">
+                    <button
+                      onClick={handleRewind}
+                      className="bg-white/20 hover:bg-white/30 rounded-full p-2 transition-all duration-200"
+                      aria-label="Rewind 10 seconds"
+                    >
+                      <Rewind size={20} className="text-white" />
+                    </button>
+                    <button
+                      onClick={handleForward}
+                      className="bg-white/20 hover:bg-white/30 rounded-full p-2 transition-all duration-200"
+                      aria-label="Forward 10 seconds"
+                    >
+                      <FastForward size={20} className="text-white" />
+                    </button>
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowSpeedControl(!showSpeedControl)}
+                        className="bg-white/20 hover:bg-white/30 rounded-full px-3 py-1.5 text-white text-sm font-medium transition-all duration-200"
+                      >
+                        {playbackSpeed}x
+                      </button>
+                      {showSpeedControl && (
+                        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black/90 backdrop-blur-sm rounded-lg p-2 flex flex-col gap-1 min-w-[80px]">
+                          {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
+                            <button
+                              key={speed}
+                              onClick={() => changePlaybackSpeed(speed)}
+                              className={`px-3 py-1 text-sm rounded-md transition-all ${
+                                playbackSpeed === speed
+                                  ? "bg-purple-600 text-white"
+                                  : "text-gray-300 hover:bg-white/20"
+                              }`}
+                            >
+                              {speed}x
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -218,15 +305,11 @@ export default function VSL() {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <div className={`h-2 w-2 rounded-full ${progress >= 55 ? 'bg-green-500' : 'bg-purple-500'} animate-pulse`}></div>
-                <p className="text-sm font-medium text-[#0b2f1d]">
-                  Your Progress
-                </p>
+                <p className="text-sm font-medium text-[#0b2f1d]">Your Progress</p>
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="text-2xl font-bold text-purple-600">
-                  {Math.floor(progress)}%
-                </div>
+                <div className="text-2xl font-bold text-purple-600">{Math.floor(progress)}%</div>
                 {progress >= 55 && (
                   <div className="flex items-center gap-1 bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full">
                     <CheckCircle size={14} />
@@ -246,6 +329,16 @@ export default function VSL() {
               </div>
             </div>
 
+            {/* Max watched time indicator */}
+            <div className="relative h-1.5 w-full mt-1">
+              <div
+                className="absolute top-0 h-full w-0.5 bg-purple-300 rounded-full"
+                style={{ left: `${(maxWatchedTime.current / (videoRef.current?.duration || 1)) * 100}%` }}
+              >
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-purple-400 rounded-full"></div>
+              </div>
+            </div>
+
             <div className="mt-3 flex justify-between items-center text-xs text-[#6b756c]">
               <div className="flex items-center gap-1">
                 <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
@@ -254,6 +347,22 @@ export default function VSL() {
               <div className="flex items-center gap-1">
                 <Lock size={12} />
                 <span>{progress >= 55 ? 'Assessment unlocked' : `${55 - Math.floor(progress)}% more to unlock`}</span>
+              </div>
+            </div>
+
+            {/* Feature badges */}
+            <div className="mt-3 flex flex-wrap justify-center gap-2">
+              <div className="flex items-center gap-1 bg-purple-50 text-purple-700 text-xs px-2 py-1 rounded-full">
+                <Rewind size={12} />
+                <span>Can rewind anytime</span>
+              </div>
+              <div className="flex items-center gap-1 bg-gray-50 text-gray-600 text-xs px-2 py-1 rounded-full">
+                <FastForward size={12} />
+                <span>Can't skip forward</span>
+              </div>
+              <div className="flex items-center gap-1 bg-green-50 text-green-600 text-xs px-2 py-1 rounded-full">
+                <CheckCircle size={12} />
+                <span>Resume from where you left</span>
               </div>
             </div>
           </div>
