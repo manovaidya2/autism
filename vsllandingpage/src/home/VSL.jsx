@@ -240,7 +240,7 @@ export default function VSL() {
               <video
                 ref={videoRef}
                 className="absolute inset-0 h-full w-full object-cover"
-                controls={isPlaying}
+                controls={false}
                 playsInline
                 preload="metadata"
                 controlsList="nodownload noplaybackrate"
@@ -251,52 +251,81 @@ export default function VSL() {
                 <source src="/video/lesson 1.mp4" type="video/mp4" />
               </video>
 
-              {/* Custom Controls Overlay when playing */}
-              {isPlaying && (
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 hover:opacity-100 transition-opacity duration-300 z-20">
-                  <div className="flex items-center justify-center gap-4">
+              {/* Custom Controls - Always Visible */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 z-20">
+                <div className="flex items-center justify-center gap-4">
+                  {/* Rewind Button */}
+                  <button
+                    onClick={handleRewind}
+                    className="bg-white/20 hover:bg-white/30 rounded-full p-2 transition-all duration-200 transform hover:scale-105"
+                    aria-label="Rewind 10 seconds"
+                  >
+                    <Rewind size={24} className="text-white" />
+                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-white text-[10px] bg-black/60 px-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">-10s</span>
+                  </button>
+
+                  {/* Play/Pause Button */}
+                  <button
+                    onClick={() => {
+                      if (videoRef.current) {
+                        if (isPlaying) {
+                          videoRef.current.pause();
+                        } else {
+                          videoRef.current.play();
+                        }
+                      }
+                    }}
+                    className="bg-purple-600 hover:bg-purple-700 rounded-full p-3 transition-all duration-200 transform hover:scale-105 shadow-lg"
+                    aria-label={isPlaying ? "Pause" : "Play"}
+                  >
+                    {isPlaying ? (
+                      <div className="w-6 h-6 flex items-center justify-center">
+                        <div className="w-1.5 h-5 bg-white mx-0.5 rounded-sm"></div>
+                        <div className="w-1.5 h-5 bg-white mx-0.5 rounded-sm"></div>
+                      </div>
+                    ) : (
+                      <Play size={24} className="text-white ml-0.5" fill="white" />
+                    )}
+                  </button>
+
+                  {/* Forward Button */}
+                  <button
+                    onClick={handleForward}
+                    className="bg-white/20 hover:bg-white/30 rounded-full p-2 transition-all duration-200 transform hover:scale-105"
+                    aria-label="Forward 10 seconds"
+                  >
+                    <FastForward size={24} className="text-white" />
+                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-white text-[10px] bg-black/60 px-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">+10s</span>
+                  </button>
+
+                  {/* Speed Control Button */}
+                  <div className="relative">
                     <button
-                      onClick={handleRewind}
-                      className="bg-white/20 hover:bg-white/30 rounded-full p-2 transition-all duration-200"
-                      aria-label="Rewind 10 seconds"
+                      onClick={() => setShowSpeedControl(!showSpeedControl)}
+                      className="bg-white/20 hover:bg-white/30 rounded-full px-3 py-2 text-white text-sm font-medium transition-all duration-200"
                     >
-                      <Rewind size={20} className="text-white" />
+                      {playbackSpeed}x
                     </button>
-                    <button
-                      onClick={handleForward}
-                      className="bg-white/20 hover:bg-white/30 rounded-full p-2 transition-all duration-200"
-                      aria-label="Forward 10 seconds"
-                    >
-                      <FastForward size={20} className="text-white" />
-                    </button>
-                    <div className="relative">
-                      <button
-                        onClick={() => setShowSpeedControl(!showSpeedControl)}
-                        className="bg-white/20 hover:bg-white/30 rounded-full px-3 py-1.5 text-white text-sm font-medium transition-all duration-200"
-                      >
-                        {playbackSpeed}x
-                      </button>
-                      {showSpeedControl && (
-                        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black/90 backdrop-blur-sm rounded-lg p-2 flex flex-col gap-1 min-w-[80px]">
-                          {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
-                            <button
-                              key={speed}
-                              onClick={() => changePlaybackSpeed(speed)}
-                              className={`px-3 py-1 text-sm rounded-md transition-all ${
-                                playbackSpeed === speed
-                                  ? "bg-purple-600 text-white"
-                                  : "text-gray-300 hover:bg-white/20"
-                              }`}
-                            >
-                              {speed}x
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                    {showSpeedControl && (
+                      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black/90 backdrop-blur-sm rounded-lg p-2 flex flex-col gap-1 min-w-[80px] shadow-xl">
+                        {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
+                          <button
+                            key={speed}
+                            onClick={() => changePlaybackSpeed(speed)}
+                            className={`px-3 py-1 text-sm rounded-md transition-all ${
+                              playbackSpeed === speed
+                                ? "bg-purple-600 text-white"
+                                : "text-gray-300 hover:bg-white/20"
+                            }`}
+                          >
+                            {speed}x
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
 
@@ -326,16 +355,6 @@ export default function VSL() {
                 style={{ width: `${progress}%` }}
               >
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-md"></div>
-              </div>
-            </div>
-
-            {/* Max watched time indicator */}
-            <div className="relative h-1.5 w-full mt-1">
-              <div
-                className="absolute top-0 h-full w-0.5 bg-purple-300 rounded-full"
-                style={{ left: `${(maxWatchedTime.current / (videoRef.current?.duration || 1)) * 100}%` }}
-              >
-                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-purple-400 rounded-full"></div>
               </div>
             </div>
 
