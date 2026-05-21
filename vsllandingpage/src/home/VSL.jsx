@@ -1,13 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ArrowRight, Lock, CheckCircle, Play, Rewind, FastForward } from "lucide-react";
+import { ArrowRight, Lock, CheckCircle, Play, Rewind, FastForward, Volume2, VolumeX, Maximize, Minimize, Settings } from "lucide-react";
 import img from "../images/3.jpg.jpeg";
 
 export default function VSL() {
   const videoRef = useRef(null);
+  const containerRef = useRef(null);
   const maxWatchedTime = useRef(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showSpeedControl, setShowSpeedControl] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showControls, setShowControls] = useState(true);
+  const [controlsTimeout, setControlsTimeout] = useState(null);
+  const [isHovering, setIsHovering] = useState(false);
 
   const STORAGE_KEY = "vsl_lesson_1_progress";
 
@@ -23,9 +32,11 @@ export default function VSL() {
 
     const handleLoadedMetadata = () => {
       setIsVideoReady(true);
+      setDuration(video.duration);
       if (savedTime > 0 && savedTime < video.duration) {
         video.currentTime = savedTime;
         maxWatchedTime.current = savedTime;
+        setCurrentTime(savedTime);
 
         const savedPercent = (savedTime / video.duration) * 100;
         setProgress(savedPercent);
@@ -38,8 +49,9 @@ export default function VSL() {
 
     const handleTimeUpdate = () => {
       if (!video) return;
-
-      // Update max watched time (only forward progress)
+      
+      setCurrentTime(video.currentTime);
+      
       if (video.currentTime > maxWatchedTime.current) {
         maxWatchedTime.current = video.currentTime;
         localStorage.setItem(STORAGE_KEY, String(video.currentTime));
@@ -60,21 +72,18 @@ export default function VSL() {
 
     const preventSeekForward = () => {
       if (!video) return;
-
-      // If trying to seek forward beyond max watched time, prevent it
       if (video.currentTime > maxWatchedTime.current + 0.5) {
         video.currentTime = maxWatchedTime.current;
+        setCurrentTime(maxWatchedTime.current);
       }
-      // Allow seeking backward without any issue (no pause)
     };
 
-    // Handle seeking events without pausing
     const handleSeeking = () => {
       preventSeekForward();
     };
 
     const handleSeeked = () => {
-      // Ensure video continues playing if it was playing before seek
+      setCurrentTime(video.currentTime);
       if (isPlaying && video.paused) {
         video.play().catch(err => console.log("Play prevented:", err));
       }
@@ -103,6 +112,18 @@ export default function VSL() {
     };
   }, [isPlaying]);
 
+  // Hide controls after inactivity
+  useEffect(() => {
+    if (!isHovering && isPlaying) {
+      const timeout = setTimeout(() => {
+        setShowControls(false);
+      }, 3000);
+      return () => clearTimeout(timeout);
+    } else {
+      setShowControls(true);
+    }
+  }, [isHovering, isPlaying]);
+
   const handlePlayClick = () => {
     if (videoRef.current) {
       videoRef.current.play();
@@ -114,7 +135,7 @@ export default function VSL() {
     if (videoRef.current) {
       const newTime = Math.max(0, videoRef.current.currentTime - 10);
       videoRef.current.currentTime = newTime;
-      // Keep playing if it was playing
+      setCurrentTime(newTime);
       if (isPlaying && videoRef.current.paused) {
         videoRef.current.play();
       }
@@ -126,7 +147,7 @@ export default function VSL() {
       const newTime = Math.min(maxWatchedTime.current, videoRef.current.currentTime + 10);
       if (newTime <= maxWatchedTime.current) {
         videoRef.current.currentTime = newTime;
-        // Keep playing if it was playing
+        setCurrentTime(newTime);
         if (isPlaying && videoRef.current.paused) {
           videoRef.current.play();
         }
@@ -140,6 +161,80 @@ export default function VSL() {
       setPlaybackSpeed(speed);
       setShowSpeedControl(false);
     }
+  };
+
+  const handleProgressBarClick = (e) => {
+    if (videoRef.current) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const width = rect.width;
+      const clickPercent = (x / width);
+      const newTime = clickPercent * duration;
+      
+      if (newTime <= maxWatchedTime.current) {
+        videoRef.current.currentTime = newTime;
+        setCurrentTime(newTime);
+        if (isPlaying && videoRef.current.paused) {
+          videoRef.current.play();
+        }
+      }
+    }
+  };
+
+  const handleVolumeChange = (e) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    if (videoRef.current) {
+      videoRef.current.volume = newVolume;
+    }
+    setIsMuted(newVolume === 0);
+  };
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      if (isMuted) {
+        videoRef.current.volume = volume;
+        setIsMuted(false);
+      } else {
+        videoRef.current.volume = 0;
+        setIsMuted(true);
+      }
+    }
+  };
+
+  const toggleFullscreen = () => {
+    if (!containerRef.current) return;
+    
+    if (!isFullscreen) {
+      if (containerRef.current.requestFullscreen) {
+        containerRef.current.requestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const formatTime = (seconds) => {
+    if (isNaN(seconds)) return "0:00";
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    
+    if (hrs > 0) {
+      return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -177,159 +272,204 @@ export default function VSL() {
 
           {/* Modern Video Frame Design */}
           <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#062f1c] to-[#0a4228] p-3 shadow-[0_30px_60px_-15px_rgba(6,47,28,0.4)]">
-            {/* Decorative corner accents */}
-            <div className="absolute top-3 left-3 w-12 h-12 border-l-2 border-t-2 border-[#d6a22e]/30 rounded-tl-2xl z-10"></div>
-            <div className="absolute top-3 right-3 w-12 h-12 border-r-2 border-t-2 border-[#d6a22e]/30 rounded-tr-2xl z-10"></div>
-            <div className="absolute bottom-3 left-3 w-12 h-12 border-l-2 border-b-2 border-[#d6a22e]/30 rounded-bl-2xl z-10"></div>
-            <div className="absolute bottom-3 right-3 w-12 h-12 border-r-2 border-b-2 border-[#d6a22e]/30 rounded-br-2xl z-10"></div>
-
-            <div className="relative aspect-video overflow-hidden rounded-[24px] bg-black/50 backdrop-blur-sm">
-              {/* Thumbnail overlay - shown when video is not playing */}
-              {!isPlaying && (
-                <div className="absolute inset-0 z-10">
-                  {/* Video Thumbnail */}
-                  <img
-                    src={img}
-                    alt="Video thumbnail"
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      const target = e.target;
-                      target.style.display = 'none';
-                      const parent = target.parentElement;
-                      if (parent) {
-                        parent.classList.add('bg-gradient-to-br', 'from-[#0b2f1d]', 'to-[#1a4a2e]');
-                      }
-                    }}
-                  />
-                  {/* Gradient overlay for better play button visibility */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-
-                  {/* Custom Play Button - Purple Theme */}
-                  <button
-                    onClick={handlePlayClick}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-20"
-                    aria-label="Play video"
-                  >
-                    <div className="relative">
-                      <div className="absolute inset-0 rounded-full bg-purple-500 animate-ping opacity-40"></div>
-                      <div className="relative flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-purple-600 shadow-xl transition-all duration-300 group-hover:scale-110 group-hover:bg-purple-700">
-                        <Play size={36} className="ml-1 text-white sm:size-10" fill="white" />
-                      </div>
-                    </div>
-                  </button>
-
-                  {/* Progress pill on thumbnail */}
-                  {progress > 0 && progress < 100 && (
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-sm rounded-full px-3 py-1.5 z-20">
-                      <div className="flex items-center gap-2">
-                        <div className="text-xs font-medium text-white">
-                          {Math.floor(progress)}% watched
-                        </div>
-                        <div className="w-20 h-1.5 bg-white/30 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-purple-500 rounded-full transition-all duration-300"
-                            style={{ width: `${progress}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <video
-                ref={videoRef}
-                className="absolute inset-0 h-full w-full object-cover"
-                controls={false}
-                playsInline
-                preload="metadata"
-                controlsList="nodownload noplaybackrate"
-                disablePictureInPicture
-                onContextMenu={(e) => e.preventDefault()}
-                poster="/video/thumbnail.jpg"
+            <div className="relative aspect-video overflow-hidden rounded-[24px] bg-black">
+              {/* Video Container */}
+              <div 
+                ref={containerRef}
+                className="relative w-full h-full"
+                onMouseEnter={() => {
+                  setIsHovering(true);
+                  setShowControls(true);
+                }}
+                onMouseLeave={() => {
+                  setIsHovering(false);
+                  if (isPlaying) {
+                    setTimeout(() => setShowControls(false), 3000);
+                  }
+                }}
+                onMouseMove={() => {
+                  setShowControls(true);
+                  if (controlsTimeout) clearTimeout(controlsTimeout);
+                  if (isPlaying) {
+                    const timeout = setTimeout(() => {
+                      if (!isHovering) setShowControls(false);
+                    }, 3000);
+                    setControlsTimeout(timeout);
+                  }
+                }}
               >
-                <source src="/video/lesson 1.mp4" type="video/mp4" />
-              </video>
+                <video
+                  ref={videoRef}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  controls={false}
+                  playsInline
+                  preload="metadata"
+                  onContextMenu={(e) => e.preventDefault()}
+                >
+                  <source src="/video/lesson 1.mp4" type="video/mp4" />
+                </video>
 
-              {/* Custom Controls - Always Visible */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 z-20">
-                <div className="flex items-center justify-center gap-4">
-                  {/* Rewind Button */}
-                  <button
-                    onClick={handleRewind}
-                    className="bg-white/20 hover:bg-white/30 rounded-full p-2 transition-all duration-200 transform hover:scale-105"
-                    aria-label="Rewind 10 seconds"
-                  >
-                    <Rewind size={24} className="text-white" />
-                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-white text-[10px] bg-black/60 px-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">-10s</span>
-                  </button>
-
-                  {/* Play/Pause Button */}
-                  <button
-                    onClick={() => {
-                      if (videoRef.current) {
-                        if (isPlaying) {
-                          videoRef.current.pause();
-                        } else {
-                          videoRef.current.play();
-                        }
-                      }
-                    }}
-                    className="bg-purple-600 hover:bg-purple-700 rounded-full p-3 transition-all duration-200 transform hover:scale-105 shadow-lg"
-                    aria-label={isPlaying ? "Pause" : "Play"}
-                  >
-                    {isPlaying ? (
-                      <div className="w-6 h-6 flex items-center justify-center">
-                        <div className="w-1.5 h-5 bg-white mx-0.5 rounded-sm"></div>
-                        <div className="w-1.5 h-5 bg-white mx-0.5 rounded-sm"></div>
-                      </div>
-                    ) : (
-                      <Play size={24} className="text-white ml-0.5" fill="white" />
-                    )}
-                  </button>
-
-                  {/* Forward Button */}
-                  <button
-                    onClick={handleForward}
-                    className="bg-white/20 hover:bg-white/30 rounded-full p-2 transition-all duration-200 transform hover:scale-105"
-                    aria-label="Forward 10 seconds"
-                  >
-                    <FastForward size={24} className="text-white" />
-                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-white text-[10px] bg-black/60 px-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">+10s</span>
-                  </button>
-
-                  {/* Speed Control Button */}
-                  <div className="relative">
+                {/* Thumbnail overlay */}
+                {!isPlaying && (
+                  <div className="absolute inset-0 z-10">
+                    <img
+                      src={img}
+                      alt="Video thumbnail"
+                      className="h-full w-full object-cover"
+                      onError={(e) => {
+                        const target = e.target;
+                        target.style.display = 'none';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                    
                     <button
-                      onClick={() => setShowSpeedControl(!showSpeedControl)}
-                      className="bg-white/20 hover:bg-white/30 rounded-full px-3 py-2 text-white text-sm font-medium transition-all duration-200"
+                      onClick={handlePlayClick}
+                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-20"
                     >
-                      {playbackSpeed}x
-                    </button>
-                    {showSpeedControl && (
-                      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black/90 backdrop-blur-sm rounded-lg p-2 flex flex-col gap-1 min-w-[80px] shadow-xl">
-                        {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
-                          <button
-                            key={speed}
-                            onClick={() => changePlaybackSpeed(speed)}
-                            className={`px-3 py-1 text-sm rounded-md transition-all ${
-                              playbackSpeed === speed
-                                ? "bg-purple-600 text-white"
-                                : "text-gray-300 hover:bg-white/20"
-                            }`}
-                          >
-                            {speed}x
-                          </button>
-                        ))}
+                      <div className="relative">
+                        <div className="absolute inset-0 rounded-full bg-purple-500 animate-ping opacity-40"></div>
+                        <div className="relative flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-purple-600 shadow-xl transition-all duration-300 group-hover:scale-110 group-hover:bg-purple-700">
+                          <Play size={36} className="ml-1 text-white sm:size-10" fill="white" />
+                        </div>
                       </div>
-                    )}
+                    </button>
+                  </div>
+                )}
+
+                {/* YouTube-style Controls */}
+                <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 transition-opacity duration-300 z-20 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
+                  {/* Progress Bar */}
+                  <div className="mb-3 group">
+                    <div 
+                      className="relative h-1 w-full overflow-hidden rounded-full bg-white/30 cursor-pointer group-hover:h-1.5 transition-all duration-200"
+                      onClick={handleProgressBarClick}
+                    >
+                      <div
+                        className="absolute inset-y-0 left-0 h-full rounded-full bg-purple-500 transition-all duration-300"
+                        style={{ width: `${(currentTime / duration) * 100}%` }}
+                      >
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      </div>
+                      
+                      {/* Buffer indicator */}
+                      <div
+                        className="absolute inset-y-0 left-0 h-full rounded-full bg-white/20"
+                        style={{ width: `${(maxWatchedTime.current / duration) * 100}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  {/* Controls Bar */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {/* Play/Pause */}
+                      <button
+                        onClick={() => {
+                          if (videoRef.current) {
+                            if (isPlaying) {
+                              videoRef.current.pause();
+                            } else {
+                              videoRef.current.play();
+                            }
+                          }
+                        }}
+                        className="text-white hover:text-purple-400 transition-colors p-1"
+                      >
+                        {isPlaying ? (
+                          <div className="w-5 h-5 flex items-center justify-center gap-0.5">
+                            <div className="w-1 h-4 bg-white rounded-sm"></div>
+                            <div className="w-1 h-4 bg-white rounded-sm"></div>
+                          </div>
+                        ) : (
+                          <Play size={20} className="fill-white" />
+                        )}
+                      </button>
+
+                      {/* Volume */}
+                      <div className="flex items-center gap-1 group relative">
+                        <button
+                          onClick={toggleMute}
+                          className="text-white hover:text-purple-400 transition-colors p-1"
+                        >
+                          {isMuted || volume === 0 ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                        </button>
+                        <div className="w-0 overflow-hidden group-hover:w-20 transition-all duration-300">
+                          <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            value={isMuted ? 0 : volume}
+                            onChange={handleVolumeChange}
+                            className="w-20 h-1 bg-white/30 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-500"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Time */}
+                      <div className="text-white text-sm">
+                        {formatTime(currentTime)} / {formatTime(duration)}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {/* Rewind */}
+                      <button
+                        onClick={handleRewind}
+                        className="text-white hover:text-purple-400 transition-colors p-1"
+                      >
+                        <Rewind size={20} />
+                      </button>
+
+                      {/* Forward */}
+                      <button
+                        onClick={handleForward}
+                        className="text-white hover:text-purple-400 transition-colors p-1"
+                      >
+                        <FastForward size={20} />
+                      </button>
+
+                      {/* Speed */}
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowSpeedControl(!showSpeedControl)}
+                          className="text-white hover:text-purple-400 transition-colors p-1 text-sm font-medium"
+                        >
+                          {playbackSpeed}x
+                        </button>
+                        {showSpeedControl && (
+                          <div className="absolute bottom-full right-0 mb-2 bg-black/95 backdrop-blur-sm rounded-lg py-2 min-w-[100px] shadow-xl z-30">
+                            {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
+                              <button
+                                key={speed}
+                                onClick={() => changePlaybackSpeed(speed)}
+                                className={`w-full px-4 py-1.5 text-sm text-left transition-all hover:bg-white/10 ${
+                                  playbackSpeed === speed ? 'text-purple-400' : 'text-white'
+                                }`}
+                              >
+                                {speed}x
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Fullscreen */}
+                      <button
+                        onClick={toggleFullscreen}
+                        className="text-white hover:text-purple-400 transition-colors p-1"
+                      >
+                        {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Enhanced Progress UI with smooth bar */}
+          {/* Progress UI */}
           <div className="mt-8 bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-white/50 shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
@@ -348,7 +488,6 @@ export default function VSL() {
               </div>
             </div>
 
-            {/* Smooth Progress Bar - Purple Theme */}
             <div className="relative h-3 w-full overflow-hidden rounded-full bg-[#e5dfd2]">
               <div
                 className="absolute inset-y-0 left-0 h-full rounded-full bg-gradient-to-r from-purple-500 to-purple-700 transition-all duration-500 ease-out shadow-inner"
@@ -369,7 +508,6 @@ export default function VSL() {
               </div>
             </div>
 
-            {/* Feature badges */}
             <div className="mt-3 flex flex-wrap justify-center gap-2">
               <div className="flex items-center gap-1 bg-purple-50 text-purple-700 text-xs px-2 py-1 rounded-full">
                 <Rewind size={12} />
