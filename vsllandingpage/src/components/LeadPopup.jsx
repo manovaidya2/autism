@@ -281,11 +281,17 @@ export default function LeadPopup() {
 
     try {
       const cleanPhone = formData.phone.replace(/\D/g, "");
+      
+      // Generate dummy email if user didn't provide one
+      let finalEmail = formData.email.trim();
+      if (!finalEmail) {
+        finalEmail = `user_${cleanPhone}_${Date.now()}@temp.manovaidya.com`;
+      }
 
       const payload = {
         name: formData.name.trim(),
         phone: cleanPhone,
-        email: formData.email.trim() || "",
+        email: finalEmail,
         notes: `
 Date: ${formData.date}
 Time Slot: ${formData.time}
@@ -307,6 +313,21 @@ Mode: ${formData.mode}
 
       if (!response.ok) {
         throw new Error(data.message || "Lead submit failed");
+      }
+
+      // Track Facebook Pixel Event
+      if (typeof fbq === 'function') {
+        fbq('track', 'Lead', {
+          content_name: 'Neuro-Assessment Test',
+          content_category: 'Consultation Booking',
+          phone: cleanPhone,
+          mode: formData.mode
+        });
+        
+        fbq('track', 'CompleteRegistration', {
+          content_name: 'Consultation Form Submitted',
+          status: 'success'
+        });
       }
 
       setIsSubmitted(true);
