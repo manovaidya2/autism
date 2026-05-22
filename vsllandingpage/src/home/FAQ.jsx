@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 export default function FAQ() {
   const faqs = [
     {
-      q: "Is the ₹499 session a treatment session?",
+      q: "Is the ₹599 session a treatment session?",
       a: "No. It is a structured assessment to identify the actual neuro-development gaps and create your roadmap before any treatment begins.",
     },
     {

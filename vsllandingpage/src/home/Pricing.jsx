@@ -60,7 +60,7 @@ export default function Pricing() {
                 </div>
 
                 <div className="mb-2 text-[20px] text-white/50 line-through">
-                  ₹2000+
+                  ₹1999+
                 </div>
               </div>
 

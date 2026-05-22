@@ -28,7 +28,8 @@ export default function WhatYouGet() {
                 <span className="h-[1px] w-8 bg-[#d6a22e]"></span>
 
                 <p className="text-[12px] sm:text-[13px] uppercase tracking-[0.32em] text-[#d6a22e] font-medium">
-                  Inside the ₹499 Clarity Session
+                  
+Book Neuro-Assessment Development Test
                 </p>
               </div>
 
@@ -63,7 +64,7 @@ export default function WhatYouGet() {
                   <Sparkles className="h-4 w-4 text-[#d6a22e]" />
 
                   <span className="text-[15px] sm:text-[16px] font-semibold">
-                    Book Your ₹499 Clarity Session
+                 Book Neuro-Assessment Development Test
                   </span>
                 </button>
               </div>
