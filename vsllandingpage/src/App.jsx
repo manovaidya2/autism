@@ -6,6 +6,7 @@ import Homepage from "./pages/Homepage";
 import Footer from "./components/Footer";
 import LeadPopup from "./components/LeadPopup";
 import BookingForm from "./components/BookingForm";
+import ThankYou from "./components/ThankYou";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/book-appointment" element={<BookingForm />} />
+        <Route path="/thank-you" element={<ThankYou />} />
       </Routes>
 
       <Footer />
