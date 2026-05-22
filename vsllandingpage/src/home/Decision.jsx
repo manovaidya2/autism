@@ -88,7 +88,8 @@ export default function Decision() {
                     className="group inline-flex items-center gap-2 rounded-full bg-[#d6a22e] px-7 py-3.5 text-[15px] font-semibold text-[#062f1c] transition-all duration-300 hover:scale-[1.02]"
                   >
 
-                    Book Your ₹499 Clarity Session
+                  
+Book Neuro-Assessment Development Test
 
                     <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
 

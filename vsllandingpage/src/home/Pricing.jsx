@@ -91,7 +91,8 @@ export default function Pricing() {
                   onClick={() => setOpen(true)}
                   className="inline-flex cursor-pointer items-center justify-center rounded-full bg-[#d6a22e] px-8 py-4 text-[15px] font-semibold text-[#062f1c] shadow-[0_18px_45px_rgba(214,162,46,0.22)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
                 >
-                  Book Your ₹499 Clarity Session
+                 
+Book Neuro-Assessment Development Test
                 </button>
 
                 <div className="flex items-center gap-2 text-[14px] text-[#d6a22e]">

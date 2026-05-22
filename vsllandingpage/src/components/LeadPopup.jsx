@@ -161,6 +161,18 @@ export default function LeadPopup() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showCalendar]);
 
+  // Check if form is filled (at least required fields)
+  const isFormFilled = () => {
+    const cleanPhone = formData.phone.replace(/\D/g, "");
+    return (
+      formData.name.trim() !== "" &&
+      cleanPhone.length === 10 &&
+      formData.date !== "" &&
+      formData.time !== "" &&
+      formData.mode !== ""
+    );
+  };
+
   useEffect(() => {
     const alreadyFilled = localStorage.getItem("consultationFormSubmitted");
 
@@ -182,9 +194,8 @@ export default function LeadPopup() {
       newErrors.name = "Full name is required";
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    // Email is now OPTIONAL - only validate format if provided
+    if (formData.email.trim() && !/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Email is invalid";
     }
 
@@ -247,6 +258,14 @@ export default function LeadPopup() {
     }
   };
 
+  const handleClosePopup = () => {
+    // Only allow closing if form is filled OR already submitted
+    if (isFormFilled() || isSubmitted) {
+      setShowPopup(false);
+      document.body.style.overflow = "auto";
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -266,7 +285,7 @@ export default function LeadPopup() {
       const payload = {
         name: formData.name.trim(),
         phone: cleanPhone,
-        email: formData.email.trim(),
+        email: formData.email.trim() || "",
         notes: `
 Date: ${formData.date}
 Time Slot: ${formData.time}
@@ -313,15 +332,18 @@ Mode: ${formData.mode}
   return (
     <div className="fixed inset-0 z-[99999] flex items-start justify-center bg-black/60 px-3 pt-20 pb-3 overflow-y-auto">
       <div className="relative w-full max-w-3xl rounded-2xl bg-white shadow-2xl">
-        {/* Close Button */}
+        {/* Close Button - Only enabled when form is filled */}
         <div className="sticky top-0 z-10 flex justify-end bg-white pt-3 pr-3 rounded-t-2xl">
           <button
             type="button"
-            onClick={() => {
-              setShowPopup(false);
-              document.body.style.overflow = "auto";
-            }}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f5f2ea] text-[#0b2f1d] hover:bg-[#e8dfd0] transition-colors"
+            onClick={handleClosePopup}
+            className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+              isFormFilled() || isSubmitted
+                ? "bg-[#f5f2ea] text-[#0b2f1d] hover:bg-[#e8dfd0] cursor-pointer"
+                : "bg-gray-100 text-gray-400 cursor-not-allowed"
+            }`}
+            disabled={!isFormFilled() && !isSubmitted}
+            title={!isFormFilled() && !isSubmitted ? "Please fill the form first" : "Close"}
           >
             <X className="h-4 w-4" />
           </button>
@@ -379,14 +401,14 @@ Mode: ${formData.mode}
 
               <div>
                 <label className="mb-1 block text-xs font-semibold text-[#193b2b]">
-                  Email Address *
+                  Email Address <span className="text-[#6b756c] font-normal">(Optional)</span>
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#6b756c]" />
                   <input
                     name="email"
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder="Enter your email (optional)"
                     value={formData.email}
                     onChange={handleChange}
                     className={`w-full rounded-xl border pl-9 pr-3 py-2 text-sm outline-none transition-all focus:border-[#d6a22e] ${
