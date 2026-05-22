@@ -56,7 +56,7 @@ export default function Pricing() {
 
               <div className="mt-6 flex items-end gap-4">
                 <div className="font-serif text-[64px] sm:text-[78px] leading-none text-[#d6a22e]">
-                  ₹499
+                  ₹599
                 </div>
 
                 <div className="mb-2 text-[20px] text-white/50 line-through">

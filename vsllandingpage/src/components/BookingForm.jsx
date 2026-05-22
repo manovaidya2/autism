@@ -42,9 +42,74 @@ export default function BookingForm() {
     }
   };
 
+  // Check if a date is allowed (Tuesday, Thursday, or Saturday)
+  const isDateAllowed = (date) => {
+    const day = date.getDay(); // 0 = Sunday, 1 = Monday, 2 = Tuesday, 3 = Wednesday, 4 = Thursday, 5 = Friday, 6 = Saturday
+    return day === 2 || day === 4 || day === 6; // Tuesday (2), Thursday (4), Saturday (6)
+  };
+
+  // Get next available allowed date
+  const getNextAllowedDate = () => {
+    const today = new Date();
+    let nextDate = new Date(today);
+    
+    while (!isDateAllowed(nextDate)) {
+      nextDate.setDate(nextDate.getDate() + 1);
+    }
+    
+    return nextDate;
+  };
+
+  // Get min date (today or next allowed date if today is not allowed)
   const getMinDate = () => {
     const today = new Date();
-    return today.toISOString().split("T")[0];
+    if (isDateAllowed(today)) {
+      return today.toISOString().split("T")[0];
+    }
+    return getNextAllowedDate().toISOString().split("T")[0];
+  };
+
+  // Handle date change with validation
+  const handleDateChange = (e) => {
+    const selectedDate = new Date(e.target.value);
+    
+    if (!isDateAllowed(selectedDate)) {
+      alert("Assessments are only available on Tuesdays, Thursdays, and Saturdays. Please select another date.");
+      setFormData({ ...formData, date: "" });
+    } else {
+      setFormData({ ...formData, date: e.target.value });
+    }
+  };
+
+  // Custom styling for date input to show allowed days
+  const getDateInputProps = () => {
+    return {
+      min: getMinDate(),
+      pattern: "[0-9]{4}-[0-9]{2}-[0-9]{2}",
+      title: "Assessments available only on Tuesdays, Thursdays, and Saturdays",
+    };
+  };
+
+  // Format allowed days message
+  const getAllowedDaysMessage = () => {
+    const today = new Date();
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const nextTuesday = new Date(today);
+    const nextThursday = new Date(today);
+    const nextSaturday = new Date(today);
+    
+    // Find next Tuesday
+    while (nextTuesday.getDay() !== 2) nextTuesday.setDate(nextTuesday.getDate() + 1);
+    // Find next Thursday
+    while (nextThursday.getDay() !== 4) nextThursday.setDate(nextThursday.getDate() + 1);
+    // Find next Saturday
+    while (nextSaturday.getDay() !== 6) nextSaturday.setDate(nextSaturday.getDate() + 1);
+    
+    const formatDate = (date) => {
+      return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    };
+    
+    return `Next available: Tue (${formatDate(nextTuesday)}), Thu (${formatDate(nextThursday)}), Sat (${formatDate(nextSaturday)})`;
   };
 
   return (
@@ -90,7 +155,7 @@ export default function BookingForm() {
               Appointment Form
             </h2>
             <p className="mt-2 text-sm text-[#747a72]">
-              Same time slot multiple users book kar sakte hain.
+              Assessments available only on Tuesdays, Thursdays & Saturdays
             </p>
           </div>
 
@@ -188,11 +253,18 @@ export default function BookingForm() {
                   type="date"
                   name="date"
                   value={formData.date}
-                  onChange={handleChange}
+                  onChange={handleDateChange}
                   min={getMinDate()}
                   required
-                  className="w-full rounded-2xl border border-[#e5ddcf] bg-[#fbfaf7] px-4 py-4 text-sm outline-none focus:border-[#06351f] focus:ring-2 focus:ring-[#06351f]/10"
+                  {...getDateInputProps()}
+                  className="w-full rounded-2xl border border-[#e5ddcf] bg-[#fbfaf7] px-4 py-4 text-sm outline-none focus:border-[#06351f] focus:ring-2 focus:ring-[#06351f]/10 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                 />
+                <p className="mt-2 text-xs text-[#d6a22e] font-medium">
+                  📅 {getAllowedDaysMessage()}
+                </p>
+                <p className="mt-1 text-xs text-[#747a72]">
+                  ⚠️ Assessments only on Tuesdays, Thursdays & Saturdays
+                </p>
               </div>
 
               <div>
@@ -213,6 +285,37 @@ export default function BookingForm() {
                     </option>
                   ))}
                 </select>
+              </div>
+            </div>
+
+            {/* Info box about available days */}
+            <div className="rounded-xl bg-[#fbfaf7] border border-[#e5ddcf] p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#d6a22e]/10 flex items-center justify-center">
+                  <span className="text-[#d6a22e] text-lg">📅</span>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#06351f]">
+                    Available Assessment Days
+                  </p>
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    <span className="inline-flex items-center gap-1 text-xs bg-white px-2 py-1 rounded-full border border-[#e5ddcf]">
+                      <span className="w-2 h-2 rounded-full bg-[#d6a22e]"></span>
+                      Tuesday
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-xs bg-white px-2 py-1 rounded-full border border-[#e5ddcf]">
+                      <span className="w-2 h-2 rounded-full bg-[#d6a22e]"></span>
+                      Thursday
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-xs bg-white px-2 py-1 rounded-full border border-[#e5ddcf]">
+                      <span className="w-2 h-2 rounded-full bg-[#d6a22e]"></span>
+                      Saturday
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs text-[#747a72]">
+                    ⏰ Time slots: 11:00 AM - 12:00 PM (10-minute each)
+                  </p>
+                </div>
               </div>
             </div>
 

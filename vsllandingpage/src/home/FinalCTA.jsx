@@ -61,7 +61,7 @@ export default function FinalCTA() {
 
             <Sparkles className="h-5 w-5" />
 
-            Book Your ₹499 Clarity Session
+            Book Your ₹599 Clarity Session
 
           </button>
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Star,
   Users,
@@ -11,7 +11,7 @@ import doctorImg from "../images/imghero.jpeg";
 
 export default function VslHero() {
 
-  /* LIVE BOOKINGS */
+  /* LIVE BOOKINGS - Extended list */
   const bookings = [
     { name: "Rajesh M.", city: "Bengaluru" },
     { name: "Priya S.", city: "Mumbai" },
@@ -20,32 +20,153 @@ export default function VslHero() {
     { name: "Meera J.", city: "Pune" },
     { name: "Kavita N.", city: "Chennai" },
     { name: "Vikram R.", city: "Ahmedabad" },
+    { name: "Sneha T.", city: "Kolkata" },
+    { name: "Rohan D.", city: "Jaipur" },
+    { name: "Divya M.", city: "Lucknow" },
+    { name: "Amit S.", city: "Nagpur" },
+    { name: "Neha G.", city: "Indore" },
+    { name: "Sanjay K.", city: "Bhopal" },
+    { name: "Pooja V.", city: "Surat" },
+    { name: "Manish B.", city: "Coimbatore" },
+    { name: "Swati R.", city: "Visakhapatnam" },
+    { name: "Deepak C.", city: "Patna" },
+    { name: "Anjali P.", city: "Vadodara" },
+    { name: "Rahul J.", city: "Ludhiana" },
+    { name: "Shreya S.", city: "Agra" },
+    { name: "Kunal N.", city: "Nashik" },
+    { name: "Ritu M.", city: "Ranchi" },
+    { name: "Alok T.", city: "Chandigarh" },
+    { name: "Shilpa D.", city: "Mysore" },
+    { name: "Varun K.", city: "Guwahati" },
   ];
 
-const [activeBooking, setActiveBooking] = useState(0);
-const [sessionCount, setSessionCount] = useState(18);
+  const [activeBooking, setActiveBooking] = useState(0);
+  const [sessionCount, setSessionCount] = useState(19);
+  const [lastIncrementTime, setLastIncrementTime] = useState(Date.now());
+  const userVisitCountRef = useRef(0);
+  const lastKnownCountRef = useRef(19);
+  const sessionStartTimeRef = useRef(Date.now());
 
- useEffect(() => {
+  // Function to get random number based on time of day and previous count
+  const getRandomBookingCount = (isReturningUser, lastCount, currentHour) => {
+    // For first time visit or if we need to reset
+    if (!isReturningUser || userVisitCountRef.current === 0) {
+      if (currentHour < 12) {
+        // Morning (before 12 PM): Random between 19-50
+        return Math.floor(Math.random() * (50 - 19 + 1)) + 19;
+      } else {
+        // Afternoon/Evening (after 12 PM): Random between 100-250
+        return Math.floor(Math.random() * (250 - 100 + 1)) + 100;
+      }
+    } else {
+      // Returning user - continue from where they left off with realistic growth
+      if (currentHour < 12) {
+        // Morning: Add realistic increment (1-7 sessions since last visit)
+        const increment = Math.floor(Math.random() * 7) + 1;
+        return lastCount + increment;
+      } else {
+        // Afternoon/Evening: Add larger increment (5-15 sessions since last visit)
+        const increment = Math.floor(Math.random() * 15) + 5;
+        return lastCount + increment;
+      }
+    }
+  };
 
-  const interval = setInterval(() => {
+  // Check if user is returning (using session storage)
+  useEffect(() => {
+    const hasVisitedBefore = sessionStorage.getItem('hasVisitedVslHero');
+    const storedCount = sessionStorage.getItem('lastSessionCount');
+    const storedTime = sessionStorage.getItem('lastVisitTime');
+    
+    const currentHour = new Date().getHours();
+    
+    if (hasVisitedBefore && storedCount) {
+      userVisitCountRef.current = parseInt(sessionStorage.getItem('visitCount') || '1');
+      const lastCount = parseInt(storedCount);
+      const lastVisitTime = parseInt(storedTime || '0');
+      const timeDifference = (Date.now() - lastVisitTime) / (1000 * 60); // minutes difference
+      
+      // If more than 5 minutes have passed, show realistic growth
+      if (timeDifference > 5) {
+        const newCount = getRandomBookingCount(true, lastCount, currentHour);
+        setSessionCount(newCount);
+        lastKnownCountRef.current = newCount;
+        sessionStorage.setItem('lastSessionCount', newCount.toString());
+      } else {
+        setSessionCount(lastCount);
+        lastKnownCountRef.current = lastCount;
+      }
+    } else {
+      // First time visitor
+      const initialCount = getRandomBookingCount(false, 0, currentHour);
+      setSessionCount(initialCount);
+      lastKnownCountRef.current = initialCount;
+      sessionStorage.setItem('hasVisitedVslHero', 'true');
+      sessionStorage.setItem('lastSessionCount', initialCount.toString());
+      sessionStorage.setItem('visitCount', '1');
+    }
+    
+    sessionStorage.setItem('lastVisitTime', Date.now().toString());
+    sessionStartTimeRef.current = Date.now();
+  }, []);
 
-    setActiveBooking((prev) =>
-      prev === bookings.length - 1 ? 0 : prev + 1
-    );
+  // Auto-increment counter every 2.5 seconds for live feel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentTime = Date.now();
+      const timeSinceLastIncrement = currentTime - lastIncrementTime;
+      
+      // Update booking name (cycles through)
+      setActiveBooking((prev) => {
+        if (prev === bookings.length - 1) {
+          return 0;
+        }
+        return prev + 1;
+      });
 
-    setSessionCount((prev) => (prev >= 32 ? 18 : prev + 1));
+      // Increment session count with realistic timing
+      setSessionCount((prev) => {
+        const newCount = prev + 1;
+        lastKnownCountRef.current = newCount;
+        sessionStorage.setItem('lastSessionCount', newCount.toString());
+        return newCount;
+      });
+      
+      setLastIncrementTime(currentTime);
+      
+      // Update visit count in session storage
+      const visitCount = parseInt(sessionStorage.getItem('visitCount') || '1');
+      sessionStorage.setItem('visitCount', (visitCount + 1).toString());
+      userVisitCountRef.current = visitCount + 1;
+      
+    }, 2500);
 
-  }, 2500);
+    return () => clearInterval(interval);
+  }, [lastIncrementTime, bookings.length]);
 
-  return () => clearInterval(interval);
+  // Format session count with commas for better readability
+  const formattedSessionCount = sessionCount.toLocaleString('en-IN');
 
-}, []);
-
+  // Get greeting based on time
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "🌅 Good Morning!";
+    if (hour < 17) return "☀️ Good Afternoon!";
+    return "🌙 Good Evening!";
+  };
 
   return (
     <section className="relative overflow-hidden bg-[#f8f7f2] text-[#0b2f1d]">
 
       <div className="mx-auto px-4 sm:px-6 lg:px-20 pt-6 sm:pt-8 lg:pt-10 pb-8 lg:pb-10">
+
+        {/* PRICE RIBBON */}
+        <div className="absolute top-6 right-6 z-10">
+          <div className="bg-[#d6a22e] text-[#0b2f1d] px-6 py-3 rounded-full shadow-lg transform rotate-6 hover:rotate-0 transition-transform duration-300">
+            <p className="text-[10px] uppercase tracking-wider font-bold">ONLY</p>
+            <p className="text-2xl font-bold">₹599 <span className="text-sm font-normal line-through opacity-70">₹1999</span></p>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
 
@@ -164,10 +285,6 @@ const [sessionCount, setSessionCount] = useState(18);
               {/* GOOGLE CARD */}
               <div className="bg-white border border-[#e7dfd0] rounded-xl px-4 py-3 shadow-sm flex items-center gap-3">
 
-                {/* <div className="h-9 w-9 rounded-full bg-[#f8f7f2] flex items-center justify-center text-base font-bold">
-                  G
-                </div> */}
-
                 <div className="text-left">
 
                   <div className="flex items-center gap-1.5">
@@ -188,42 +305,51 @@ const [sessionCount, setSessionCount] = useState(18);
 
                   </div>
 
-                  {/* <p className="text-[10px] text-[#0b2f1d] font-medium">
-                    2,300+ Google Reviews · Live
-                  </p> */}
+                  <p className="text-[9px] text-[#6b756c] mt-1">
+                    Based on 2,300+ reviews
+                  </p>
 
                 </div>
 
               </div>
 
-              {/* BOOKINGS CARD */}
+              {/* BOOKINGS CARD - Enhanced with real-time feel */}
               <div className="bg-[#062f1c] rounded-xl px-4 py-3 shadow-[0_20px_40px_rgba(6,47,28,0.15)] flex items-center gap-3 overflow-hidden">
 
                 <Users
                   size={20}
-                  className="text-[#d6a22e] flex-shrink-0"
+                  className="text-[#d6a22e] flex-shrink-0 animate-pulse"
                 />
 
                 <div className="text-left min-w-0">
 
-                <p
-  key={sessionCount}
-  className="text-white text-[13px] font-semibold animate-[slideUp_0.5s_ease]"
->
-  🟡 {sessionCount} sessions booked today
-</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></div>
+                    <p
+                      key={sessionCount}
+                      className="text-white text-[13px] font-semibold animate-[slideUp_0.5s_ease]"
+                    >
+                      🟡 {formattedSessionCount} sessions booked today
+                    </p>
+                  </div>
 
-                  {/* AUTO CHANGING TEXT */}
-                  <div className="relative h-[16px] overflow-hidden mt-1">
+                  {/* AUTO CHANGING TEXT - Real booking notifications */}
+                  <div className="relative h-[16px] overflow-hidden mt-1.5">
 
                     <p
                       key={activeBooking}
-                      className="text-white/75 text-[10px] absolute left-0 top-0 animate-[slideUp_0.5s_ease]"
+                      className="text-[#d6a22e]/80 text-[10px] absolute left-0 top-0 animate-[slideUp_0.5s_ease] font-medium"
                     >
-                      {bookings[activeBooking].name} from{" "}
-                      {bookings[activeBooking].city} just booked
+                      ✨ {bookings[activeBooking].name} from{" "}
+                      {bookings[activeBooking].city} just booked an assessment
                     </p>
 
+                  </div>
+
+                  {/* Live indicator */}
+                  <div className="mt-1.5 flex items-center gap-1">
+                    <span className="text-[6px] text-green-400 animate-pulse">●</span>
+                    <span className="text-[7px] text-white/50">Live booking feed</span>
                   </div>
 
                 </div>
@@ -235,21 +361,26 @@ const [sessionCount, setSessionCount] = useState(18);
             {/* FEATURES */}
             <div className="mt-5 flex flex-wrap justify-center lg:justify-start gap-4 text-[14px] text-[#5f6e62]">
 
-              <span className="inline-flex items-center gap-1.5">
+              <span className="inline-flex items-center gap-1.5 hover:text-[#d6a22e] transition-colors duration-200">
                 <ShieldCheck size={12} />
                 Structured System
               </span>
 
-              <span className="inline-flex items-center gap-1.5">
+              <span className="inline-flex items-center gap-1.5 hover:text-[#d6a22e] transition-colors duration-200">
                 <Target size={12} />
                 Root Cause Clarity
               </span>
 
-              <span className="inline-flex items-center gap-1.5">
+              <span className="inline-flex items-center gap-1.5 hover:text-[#d6a22e] transition-colors duration-200">
                 <CalendarDays size={12} />
                 180-Day Plan
               </span>
 
+            </div>
+
+            {/* Real-time greeting message */}
+            <div className="mt-4 text-[10px] text-[#6b756c] italic">
+              {getGreeting()} • Real-time booking updates
             </div>
 
           </div>
@@ -266,20 +397,16 @@ const [sessionCount, setSessionCount] = useState(18);
               <div className="absolute -bottom-4 -right-4 w-16 h-16 border-r border-b border-[#d6a22e] rounded-br-xl"></div>
 
               {/* IMAGE */}
-              <div className="relative rounded-xl overflow-hidden shadow-[0_25px_60px_rgba(9,33,22,0.15)]">
+              <div className="relative rounded-xl overflow-hidden shadow-[0_25px_60px_rgba(9,33,22,0.15)] group">
 
                 <img
                   src={doctorImg}
                   alt="Brain Gut Behaviour Specialist"
-                  className="w-full h-[400px] sm:h-[500px] object-cover object-center"
+                  className="w-full h-[400px] sm:h-[500px] object-cover object-center transition-transform duration-500 group-hover:scale-105"
                 />
 
                 {/* OVERLAY */}
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#062f1c]/95 via-[#062f1c]/65 to-transparent px-4 py-5 text-left">
-
-                  {/* <p className="text-[9px] uppercase tracking-[0.35em] text-[#d6a22e] font-semibold mb-1">
-                    System Developer
-                  </p> */}
 
                   <p className="font-serif text-white text-[18px] sm:text-[20px] font-normal">
                     Brain–Gut–Behaviour Specialist
@@ -296,6 +423,31 @@ const [sessionCount, setSessionCount] = useState(18);
         </div>
 
       </div>
+
+      {/* Add animation keyframes to your global CSS or add here */}
+      <style jsx>{`
+        @keyframes slideUp {
+          0% {
+            transform: translateY(100%);
+            opacity: 0;
+          }
+          100% {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+        @keyframes bounce {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-5px);
+          }
+        }
+        .animate-slideUp {
+          animation: slideUp 0.5s ease;
+        }
+      `}</style>
 
     </section>
   );
