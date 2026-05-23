@@ -547,7 +547,7 @@ export default function VSL() {
               ) : (
                 <>
                   <Lock size={20} />
-                  Watch 55% To Unlock Assessment
+                  Watch 55% video to unlock The Neuro Assessment Test
                 </>
               )}
             </a>
