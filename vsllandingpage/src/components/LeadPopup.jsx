@@ -137,10 +137,12 @@ export default function LeadPopup() {
         "true"
       );
 
+      // Close popup and redirect to home after submission
       setTimeout(() => {
         setShowPopup(false);
-        window.location.reload();
-      }, 1000);
+        document.body.style.overflow = "auto";
+        window.location.href = "/"; // Redirect to home page
+      }, 1500);
 
     } catch (err) {
       setSubmitError(err.message);
@@ -149,38 +151,47 @@ export default function LeadPopup() {
     }
   };
 
+  // Function to handle close - now does nothing (can't close without submit)
+  const handleClose = () => {
+    // User cannot close the popup without submitting
+    // Optional: Show a warning message
+    alert("Please fill and submit the form to continue");
+  };
+
   if (!showPopup) return null;
 
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 px-4">
+      {/* Clicking on backdrop won't close the popup */}
+      <div 
+        className="absolute inset-0" 
+        onClick={handleClose}
+      ></div>
+      
+      <div className="relative w-full max-w-lg rounded-3xl bg-white p-7 shadow-2xl">
 
-      <div className="w-full max-w-lg rounded-3xl bg-white p-7 shadow-2xl relative">
-
-        <button
-          onClick={() =>
-            setShowPopup(false)
-          }
+        {/* Close button - disabled or removed */}
+        {/* Button removed so user cannot close without submitting */}
+        {/* <button
+          onClick={handleClose}
           className="absolute top-5 right-5"
         >
           <X className="w-5 h-5"/>
-        </button>
+        </button> */}
 
         <div className="text-center">
-
           <h2 className="font-serif text-3xl text-[#0b2f1d]">
             Get Help Now
           </h2>
-
           <p className="mt-2 text-sm text-gray-500">
-            Fill details to continue
+            Please fill the form to continue
           </p>
-
         </div>
 
         {isSubmitted && (
           <div className="mt-4 rounded-lg bg-green-50 border border-green-200 p-3 text-green-700 text-sm flex gap-2">
             <CheckCircle className="w-4 h-4"/>
-            Submitted Successfully
+            Redirecting to home page...
           </div>
         )}
 
@@ -195,7 +206,6 @@ export default function LeadPopup() {
           onSubmit={handleSubmit}
           className="mt-6 space-y-4"
         >
-
           {/* Name */}
           <div className="relative">
             <User className="absolute left-4 top-4 h-4 w-4 text-gray-400"/>
@@ -203,9 +213,13 @@ export default function LeadPopup() {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Full Name"
+              placeholder="Full Name *"
               className="w-full rounded-xl border border-[#ddd] py-3 pl-11 pr-4"
+              disabled={isSubmitting || isSubmitted}
             />
+            {errors.name && (
+              <p className="text-red-500 text-xs mt-1 ml-2">{errors.name}</p>
+            )}
           </div>
 
           {/* Email */}
@@ -215,9 +229,13 @@ export default function LeadPopup() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Email (Optional)"
+              placeholder="Email *"
               className="w-full rounded-xl border border-[#ddd] py-3 pl-11 pr-4"
+              disabled={isSubmitting || isSubmitted}
             />
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1 ml-2">{errors.email}</p>
+            )}
           </div>
 
           {/* Phone */}
@@ -227,27 +245,34 @@ export default function LeadPopup() {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              placeholder="Phone Number"
+              placeholder="Phone Number *"
               className="w-full rounded-xl border border-[#ddd] py-3 pl-11 pr-4"
+              disabled={isSubmitting || isSubmitted}
             />
+            {errors.phone && (
+              <p className="text-red-500 text-xs mt-1 ml-2">{errors.phone}</p>
+            )}
           </div>
 
           <button
             type="submit"
-            disabled={isSubmitting}
-            className="w-full rounded-full bg-[#062f1c] py-3 text-white font-semibold flex items-center justify-center gap-2"
+            disabled={isSubmitting || isSubmitted}
+            className="w-full rounded-full bg-[#062f1c] py-3 text-white font-semibold flex items-center justify-center gap-2 hover:bg-[#0a4728] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Send className="w-4 h-4"/>
-
             {isSubmitting
               ? "Submitting..."
+              : isSubmitted
+              ? "Redirecting..."
               : "Submit & Continue"}
           </button>
-
         </form>
 
+        {/* Optional: Warning message about not being able to close */}
+        <p className="text-center text-xs text-gray-400 mt-4">
+          Please complete the form to continue
+        </p>
       </div>
-
     </div>
   );
 }
