@@ -29,6 +29,7 @@ router.post("/kraya-lead", async (req, res) => {
   email: email || "",
   notes: notes || "",
   stage: stage || "VSL Landing page",
+  
   pipeline: pipeline || "Leads",
 };
     console.log("KRAYA FINAL PAYLOAD:", payload);
