@@ -278,7 +278,7 @@ const payload = {
   name: formData.name.trim(),
   phone: cleanPhone,
   email: formData.email.trim() || "",
-  stage: "Video Watched Autism",
+  stage: "Slot Booked Autism",
   
   pipeline: "Leads",
 
