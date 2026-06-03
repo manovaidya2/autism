@@ -306,7 +306,7 @@ export default function VSL() {
                   preload="metadata"
                   onContextMenu={(e) => e.preventDefault()}
                 >
-                  <source src="/video/lesson 1.mp4" type="video/mp4" />
+                  <source src="/video/AUTISM.mp4" type="video/mp4" />
                 </video>
 
                 {/* Thumbnail overlay */}
