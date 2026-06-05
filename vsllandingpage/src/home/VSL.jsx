@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ArrowRight, Lock, CheckCircle, Play, Rewind, FastForward, Volume2, VolumeX, Maximize, Minimize, Settings } from "lucide-react";
+import BookingModal from "../components/BookingModal";
 import img from "../images/3.jpg.jpeg";
 
 export default function VSL() {
@@ -23,6 +24,7 @@ export default function VSL() {
   const [progress, setProgress] = useState(0);
   const [isUnlocked, setIsUnlocked] = useState(true);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -218,10 +220,11 @@ export default function VSL() {
   };
 
   return (
-    <section
-      id="video"
-      className="relative overflow-hidden bg-[#f8f7f2] py-16 sm:py-20 lg:py-10"
-    >
+    <>
+      <section
+        id="video"
+        className="relative overflow-hidden bg-[#f8f7f2] py-16 sm:py-20 lg:py-10"
+      >
       <div className="absolute top-[-120px] left-[-100px] h-[260px] w-[260px] rounded-full bg-[#d6a22e]/10 blur-3xl"></div>
       <div className="absolute bottom-[-130px] right-[-110px] h-[280px] w-[280px] rounded-full bg-[#062f1c]/10 blur-3xl"></div>
 
@@ -499,19 +502,24 @@ export default function VSL() {
           </div>
 
           <div className="mt-10 flex justify-center">
-            <a
-              href="/book-appointment"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={() => setBookingOpen(true)}
               className="inline-flex items-center justify-center gap-3 rounded-full px-7 py-4 text-center text-sm sm:text-base font-semibold transition-all duration-300 bg-[#0b2f1d] text-white hover:bg-purple-600 hover:text-white shadow-xl transform hover:-translate-y-0.5"
             >
               <CheckCircle size={20} />
               Book Neuro-Assessment Development Test
               <ArrowRight size={20} />
-            </a>
+            </button>
           </div>
         </div>
       </div>
     </section>
+
+      <BookingModal
+        open={bookingOpen}
+        setOpen={setBookingOpen}
+      />
+    </>
   );
 }
