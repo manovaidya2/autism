@@ -21,7 +21,7 @@ export default function VSL() {
   const STORAGE_KEY = "vsl_lesson_1_progress";
 
   const [progress, setProgress] = useState(0);
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(true);
   const [isVideoReady, setIsVideoReady] = useState(false);
 
   useEffect(() => {
@@ -40,10 +40,6 @@ export default function VSL() {
 
         const savedPercent = (savedTime / video.duration) * 100;
         setProgress(savedPercent);
-
-        if (savedPercent >= 55) {
-          setIsUnlocked(true);
-        }
       }
     };
 
@@ -63,23 +59,11 @@ export default function VSL() {
       if (duration > 0) {
         const percent = (current / duration) * 100;
         setProgress(percent);
-
-        if (percent >= 55) {
-          setIsUnlocked(true);
-        }
-      }
-    };
-
-    const preventSeekForward = () => {
-      if (!video) return;
-      if (video.currentTime > maxWatchedTime.current + 0.5) {
-        video.currentTime = maxWatchedTime.current;
-        setCurrentTime(maxWatchedTime.current);
       }
     };
 
     const handleSeeking = () => {
-      preventSeekForward();
+      // No seeking restrictions: allow free forward/backward navigation.
     };
 
     const handleSeeked = () => {
@@ -144,13 +128,11 @@ export default function VSL() {
 
   const handleForward = () => {
     if (videoRef.current) {
-      const newTime = Math.min(maxWatchedTime.current, videoRef.current.currentTime + 10);
-      if (newTime <= maxWatchedTime.current) {
-        videoRef.current.currentTime = newTime;
-        setCurrentTime(newTime);
-        if (isPlaying && videoRef.current.paused) {
-          videoRef.current.play();
-        }
+      const newTime = Math.min(duration, videoRef.current.currentTime + 10);
+      videoRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+      if (isPlaying && videoRef.current.paused) {
+        videoRef.current.play();
       }
     }
   };
@@ -171,12 +153,10 @@ export default function VSL() {
       const clickPercent = (x / width);
       const newTime = clickPercent * duration;
       
-      if (newTime <= maxWatchedTime.current) {
-        videoRef.current.currentTime = newTime;
-        setCurrentTime(newTime);
-        if (isPlaying && videoRef.current.paused) {
-          videoRef.current.play();
-        }
+      videoRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+      if (isPlaying && videoRef.current.paused) {
+        videoRef.current.play();
       }
     }
   };
@@ -473,18 +453,12 @@ export default function VSL() {
           <div className="mt-8 bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-white/50 shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <div className={`h-2 w-2 rounded-full ${progress >= 55 ? 'bg-green-500' : 'bg-purple-500'} animate-pulse`}></div>
+                <div className="h-2 w-2 rounded-full bg-purple-500 animate-pulse"></div>
                 <p className="text-sm font-medium text-[#0b2f1d]">Your Progress</p>
               </div>
 
               <div className="flex items-center gap-2">
                 <div className="text-2xl font-bold text-purple-600">{Math.floor(progress)}%</div>
-                {progress >= 55 && (
-                  <div className="flex items-center gap-1 bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full">
-                    <CheckCircle size={14} />
-                    Unlocked
-                  </div>
-                )}
               </div>
             </div>
 
@@ -504,7 +478,7 @@ export default function VSL() {
               </div>
               <div className="flex items-center gap-1">
                 <Lock size={12} />
-                <span>{progress >= 55 ? 'Assessment unlocked' : `${55 - Math.floor(progress)}% more to unlock`}</span>
+                <span>Assessment available</span>
               </div>
             </div>
 
@@ -515,7 +489,7 @@ export default function VSL() {
               </div>
               <div className="flex items-center gap-1 bg-gray-50 text-gray-600 text-xs px-2 py-1 rounded-full">
                 <FastForward size={12} />
-                <span>Can't skip forward</span>
+                <span>Can skip forward</span>
               </div>
               <div className="flex items-center gap-1 bg-green-50 text-green-600 text-xs px-2 py-1 rounded-full">
                 <CheckCircle size={12} />
@@ -526,30 +500,14 @@ export default function VSL() {
 
           <div className="mt-10 flex justify-center">
             <a
-              href={isUnlocked ? "/book-appointment" : "#"}
+              href="/book-appointment"
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => {
-                if (!isUnlocked) e.preventDefault();
-              }}
-              className={`inline-flex items-center justify-center gap-3 rounded-full px-7 py-4 text-center text-sm sm:text-base font-semibold transition-all duration-300 ${
-                isUnlocked
-                  ? "bg-[#0b2f1d] text-white hover:bg-purple-600 hover:text-white shadow-xl transform hover:-translate-y-0.5"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
+              className="inline-flex items-center justify-center gap-3 rounded-full px-7 py-4 text-center text-sm sm:text-base font-semibold transition-all duration-300 bg-[#0b2f1d] text-white hover:bg-purple-600 hover:text-white shadow-xl transform hover:-translate-y-0.5"
             >
-              {isUnlocked ? (
-                <>
-                  <CheckCircle size={20} />
-                  Book Neuro-Assessment Development Test
-                  <ArrowRight size={20} />
-                </>
-              ) : (
-                <>
-                  <Lock size={20} />
-                  Watch 55% video to unlock The Neuro Assessment Test
-                </>
-              )}
+              <CheckCircle size={20} />
+              Book Neuro-Assessment Development Test
+              <ArrowRight size={20} />
             </a>
           </div>
         </div>
