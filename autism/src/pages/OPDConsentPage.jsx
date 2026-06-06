@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import axiosInstance from '../api/axiosInstance';
-import { FileText, CheckCircle, User, Calendar, Phone, MapPin, Heart, Shield, Award, Clock, Pen, Fingerprint, Mail, Star, Upload, X, Trash2 } from 'lucide-react';
+import { CheckCircle, User, Calendar, Phone, MapPin, Heart, Shield, Award, Clock, Pen, Fingerprint, Mail, Star, Upload, X, Trash2 } from 'lucide-react';
+import logo from '../images/manovaidya-logo (1).png';
 
 const OpdConsentForm = () => {
   const [formData, setFormData] = useState({
@@ -244,13 +245,14 @@ const OpdConsentForm = () => {
       <div className="max-w-4xl mx-auto px-4 py-6 md:py-8">
         {/* Header Section */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center bg-white shadow-md rounded-xl p-3 mb-4 border border-purple-100">
-            <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-2 rounded-lg">
-              <FileText size={24} />
-            </div>
+          <div className="inline-flex items-center justify-center bg-white shadow-md rounded-xl px-5 py-3 mb-4 border border-purple-100">
+            <img
+              src={logo}
+              alt="Manovaidya Ayurvedic Clinic"
+              className="h-16 md:h-20 w-auto object-contain"
+            />
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 tracking-tight">मनोवैद्य चिकित्सालय</h1>
-          <p className="text-purple-600 text-base font-medium mt-1">Manovaidya Chikitsalaya</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 tracking-tight">Manovaidya Ayurvedic Clinic</h1>
           <p className="text-gray-500 text-sm">Ayurveda & Mental Health Wellness Center</p>
           <div className="w-20 h-0.5 bg-gradient-to-r from-purple-300 to-purple-500 mx-auto my-3 rounded-full"></div>
           <div className="inline-flex items-center gap-2 bg-purple-100/60 px-4 py-1.5 rounded-full">
@@ -514,7 +516,7 @@ const OpdConsentForm = () => {
         <div className="text-center text-gray-400 text-xs py-6 border-t border-purple-100 mt-2">
           <div className="flex justify-center items-center gap-6 flex-wrap mb-3">
             <span className="flex items-center gap-1"><Heart size={12} className="text-purple-400"/> आयुर्वेद से समग्र स्वास्थ्य</span>
-            <span className="flex items-center gap-1"><Clock size={12} className="text-purple-400"/> OPD समय: सुबह 9AM - शाम 7PM</span>
+            <span className="flex items-center gap-1"><Clock size={12} className="text-purple-400"/> OPD समय: सुबह 11AM - शाम 6PM</span>
             <span className="flex items-center gap-1"><Mail size={12} className="text-purple-400"/> contact@manovaidya.com</span>
           </div>
           <div className="h-px bg-gradient-to-r from-transparent via-purple-200 to-transparent max-w-md mx-auto my-3"></div>
