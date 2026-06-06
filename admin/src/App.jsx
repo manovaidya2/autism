@@ -17,6 +17,7 @@ import AdultBlogForm from "./adult/AdultBlogForm";
 import AdminAdultContacts from "./adult/AdminAdultContacts";
 import AdminBookings from "./components/AdminBookings";
 import AutismBookingsAdmin from "./pages/AutismBookingsAdmin";
+import AdminOPDConsents from "./pages/AdminOPDConsents";
 
 
 
@@ -44,6 +45,7 @@ function App() {
         <Route path="/admin/adult-contacts" element={<Layout><AdminAdultContacts /></Layout>} />
         <Route path="/autism-booking-vsl" element={<Layout><AdminBookings  /></Layout>} />
         <Route path="/autism-landingpage" element={<Layout><AutismBookingsAdmin /></Layout>} />
+        <Route path="/admin/opd-consents" element={<Layout><AdminOPDConsents/></Layout>} />
 
 
          

@@ -13,6 +13,7 @@ import bookingRoutes from "./routes/bookingRoutes.js";
 import autismBookingRoutes from './routes/autismBookingRoutes.js';
 import krayaLeadRoutes from "./routes/krayaLeadRoutes.js";
 import autismKrayaRoutes from "./routes/autismKrayaRoutes.js";
+import opdConsentRoutes from './routes/opdConsentRoutes.js';
 
 
 
@@ -47,6 +48,8 @@ app.use("/api/bookings", bookingRoutes);
 app.use('/api', autismBookingRoutes);
 app.use("/api", krayaLeadRoutes);
 app.use("/api", autismKrayaRoutes);
+// OPD Consent routes
+app.use('/api/opd-consent', opdConsentRoutes);
 
 
 

@@ -11,6 +11,8 @@ import ScrollToHash from "./components/ScrollToHash";
 import VideoGalleryPage from "./home/VideoGalleryPage";
 import CompactContactForm from "./components/CompactContactForm";
 import ContactForm from "./components/ContactForm";
+import OPDConsentPage from "./pages/OPDConsentPage";
+import AdminOPDConsents from "./pages/AdminOPDConsents";
 
 // Import Schema Components
 import { OrganizationJsonLd, WebSiteJsonLd, LocalBusinessJsonLd } from "./components/JsonLd";
@@ -57,6 +59,8 @@ function App() {
         <Route path="/contact" element={<ContactForm />} />
         <Route path="/testimonial-video" element={<VideoGalleryPage />} />
         <Route path="/contact-form" element={<CompactContactForm />} />
+        <Route path="/consent" element={<OPDConsentPage />} />
+        <Route path="/admin/opd-consents" element={<AdminOPDConsents />} />
       </Routes>
 
       <CTAFooterSection />
