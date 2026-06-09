@@ -18,7 +18,7 @@ import AdminAdultContacts from "./adult/AdminAdultContacts";
 import AdminBookings from "./components/AdminBookings";
 import AutismBookingsAdmin from "./pages/AutismBookingsAdmin";
 import AdminOPDConsents from "./pages/AdminOPDConsents";
-
+import Adminrefundplicy from "./pages/Adminrefundplicy";
 
 
 
@@ -46,7 +46,7 @@ function App() {
         <Route path="/autism-booking-vsl" element={<Layout><AdminBookings  /></Layout>} />
         <Route path="/autism-landingpage" element={<Layout><AutismBookingsAdmin /></Layout>} />
         <Route path="/admin/opd-consents" element={<Layout><AdminOPDConsents/></Layout>} />
-
+        <Route path="/admin/refund-policy" element={<Layout><Adminrefundplicy/></Layout>} />
 
          
     

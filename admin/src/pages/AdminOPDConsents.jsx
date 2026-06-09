@@ -1,6 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import axiosInstance from '../api/axiosInstance';
-import { Trash2, Search, Eye, Download } from 'lucide-react';
+import { Trash2, Search, Eye, Download, Printer, FileText } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const StatCard = ({ title, value, accent }) => (
   <div className="bg-white shadow rounded-lg p-4 flex-1">
@@ -18,6 +20,7 @@ const AdminOPDConsents = () => {
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(null);
   const [query, setQuery] = useState('');
+  const modalContentRef = useRef(null);
 
   const fetchConsents = async () => {
     setLoading(true);
@@ -81,6 +84,142 @@ const AdminOPDConsents = () => {
     const a = document.createElement('a'); a.href = url; a.download = 'opd_consents.csv'; a.click(); URL.revokeObjectURL(url);
   };
 
+  // Function to print the modal content
+  const printConsent = () => {
+    if (!modalContentRef.current) return;
+    
+    const printWindow = window.open('', '_blank');
+    const content = modalContentRef.current.cloneNode(true);
+    
+    // Add styles for print
+    const styles = document.querySelectorAll('style, link[rel="stylesheet"]');
+    let styleHTML = '';
+    styles.forEach(style => {
+      if (style.tagName === 'STYLE') {
+        styleHTML += style.innerHTML;
+      } else if (style.tagName === 'LINK') {
+        styleHTML += `<link href="${style.href}" rel="stylesheet">`;
+      }
+    });
+    
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Consent Form - ${selected?.patientName || 'Patient'}</title>
+          <meta charset="UTF-8">
+          ${styleHTML}
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              padding: 20px;
+              margin: 0;
+              background: white;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .print-container {
+              max-width: 800px;
+              margin: 0 auto;
+            }
+            button, .close-btn {
+              display: none;
+            }
+            img {
+              max-width: 100%;
+              height: auto;
+            }
+            @media print {
+              body {
+                padding: 0;
+              }
+              .print-header {
+                margin-bottom: 20px;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="print-container">
+            ${content.innerHTML}
+            <div style="margin-top: 30px; text-align: center; font-size: 12px; color: #999;">
+              Generated on: ${new Date().toLocaleString()}
+            </div>
+          </div>
+        </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.focus();
+    
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 500);
+  };
+
+  // Function to download as PDF
+  const downloadPDF = async () => {
+    if (!modalContentRef.current) return;
+    
+    const element = modalContentRef.current;
+    const originalOverflow = element.style.overflow;
+    element.style.overflow = 'visible';
+    
+    try {
+      // Show loading indicator
+      const loadingToast = document.createElement('div');
+      loadingToast.textContent = 'Generating PDF...';
+      loadingToast.style.cssText = 'position:fixed;top:20px;right:20px;background:#333;color:#fff;padding:10px 20px;border-radius:5px;z-index:10000;';
+      document.body.appendChild(loadingToast);
+      
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        logging: false,
+        useCORS: true,
+        allowTaint: false
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+      
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      
+      pdf.save(`consent_${selected?.patientName || 'patient'}_${selected?._id || Date.now()}.pdf`);
+      
+      loadingToast.textContent = 'PDF Downloaded!';
+      setTimeout(() => loadingToast.remove(), 2000);
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      alert('Error generating PDF. Please try again.');
+    } finally {
+      element.style.overflow = originalOverflow;
+      const toast = document.querySelector('div[style*="position:fixed"][style*="top:20px"]');
+      if (toast) toast.remove();
+    }
+  };
+
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
@@ -93,7 +232,7 @@ const AdminOPDConsents = () => {
             <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search name, mobile or typed signature" className="pl-10 pr-4 py-2 rounded-lg border w-80" />
             <div className="absolute left-3 top-2.5 text-gray-400"><Search size={16} /></div>
           </div>
-          <button onClick={exportCSV} className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-blue-500 text-white px-4 py-2 rounded-lg"><Download size={16} /> Export</button>
+          <button onClick={exportCSV} className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-blue-500 text-white px-4 py-2 rounded-lg"><Download size={16} /> Export CSV</button>
         </div>
       </div>
 
@@ -147,40 +286,64 @@ const AdminOPDConsents = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black opacity-40" onClick={() => setSelected(null)}></div>
           <div className="relative bg-white rounded-lg shadow-lg w-[95%] md:w-3/5 max-h-[90vh] overflow-auto p-6 z-10">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-lg font-semibold">{selected.patientName}</h3>
-                <p className="text-sm text-gray-500">{selected.mobile} • {selected.age ? `${selected.age} yrs` : ''}</p>
-              </div>
-              <div>
-                <button onClick={() => setSelected(null)} className="text-gray-500 hover:text-gray-700">Close</button>
-              </div>
-            </div>
-
-            <div className="mt-4 text-sm text-gray-700">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div><strong>Address:</strong> <div className="text-gray-800">{selected.address || '-'}</div></div>
-                <div><strong>Relative:</strong> <div className="text-gray-800">{selected.relativeName || '-'} • {selected.relativeMobile || '-'}</div></div>
-              </div>
-              <div className="mt-3"><strong>Typed Signature:</strong> <div className="text-gray-800">{selected.digitalSignatureText}</div></div>
-              <div className="mt-3"><strong>Signature Method:</strong> <div className="text-gray-800">{selected.signatureMethod}</div></div>
-              {selected.signatureImage && (
-                <div className="mt-3">
-                  <strong>Signature Image:</strong>
-                  <div className="mt-2"><img src={selected.signatureImage} alt="signature" className="max-h-44 border" /></div>
+            <div ref={modalContentRef}>
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-lg font-semibold">{selected.patientName}</h3>
+                  <p className="text-sm text-gray-500">{selected.mobile} • {selected.age ? `${selected.age} yrs` : ''}</p>
                 </div>
-              )}
+                <div className="flex gap-2 no-print">
+                  <button 
+                    onClick={printConsent}
+                    className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm"
+                  >
+                    <Printer size={16} /> Print
+                  </button>
+                  <button 
+                    onClick={downloadPDF}
+                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm"
+                  >
+                    <FileText size={16} /> Download PDF
+                  </button>
+                  <button 
+                    onClick={() => setSelected(null)} 
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
 
-              <div className="mt-4"><strong>Consent Clauses:</strong>
-                <ol className="list-decimal ml-5 mt-2 text-sm text-gray-700">
-                  {selected.consentClauses && selected.consentClauses.map(cl => (
-                    <li key={cl.number} className="mb-3">
-                      <div className="font-medium">{cl.number}.</div>
-                      <div className="text-gray-800 font-devanagari">{cl.hindi}</div>
-                      <div className="text-gray-500 text-sm mt-1">{cl.english}</div>
-                    </li>
-                  ))}
-                </ol>
+              <div className="mt-4 text-sm text-gray-700">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div><strong>Address:</strong> <div className="text-gray-800">{selected.address || '-'}</div></div>
+                  <div><strong>Relative:</strong> <div className="text-gray-800">{selected.relativeName || '-'} • {selected.relativeMobile || '-'}</div></div>
+                </div>
+                <div className="mt-3"><strong>Typed Signature:</strong> <div className="text-gray-800">{selected.digitalSignatureText}</div></div>
+                <div className="mt-3"><strong>Signature Method:</strong> <div className="text-gray-800">{selected.signatureMethod}</div></div>
+                {selected.signatureImage && (
+                  <div className="mt-3">
+                    <strong>Signature Image:</strong>
+                    <div className="mt-2"><img src={selected.signatureImage} alt="signature" className="max-h-44 border" /></div>
+                  </div>
+                )}
+
+                <div className="mt-4"><strong>Consent Clauses:</strong>
+                  <ol className="list-decimal ml-5 mt-2 text-sm text-gray-700">
+                    {selected.consentClauses && selected.consentClauses.map(cl => (
+                      <li key={cl.number} className="mb-3">
+                        <div className="font-medium">{cl.number}.</div>
+                        <div className="text-gray-800 font-devanagari">{cl.hindi}</div>
+                        <div className="text-gray-500 text-sm mt-1">{cl.english}</div>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+                
+                <div className="mt-4 pt-3 border-t text-xs text-gray-400">
+                  <strong>Submission ID:</strong> {selected._id}<br />
+                  <strong>Submitted on:</strong> {new Date(selected.createdAt).toLocaleString()}
+                </div>
               </div>
             </div>
           </div>

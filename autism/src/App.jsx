@@ -16,6 +16,7 @@ import AdminOPDConsents from "./pages/AdminOPDConsents";
 
 // Import Schema Components
 import { OrganizationJsonLd, WebSiteJsonLd, LocalBusinessJsonLd } from "./components/JsonLd";
+import RefundPolicyPage from "./pages/RefundPolicyPage";
 
 function App() {
   return (
@@ -61,6 +62,7 @@ function App() {
         <Route path="/contact-form" element={<CompactContactForm />} />
         <Route path="/consent" element={<OPDConsentPage />} />
         <Route path="/admin/opd-consents" element={<AdminOPDConsents />} />
+        <Route path="/refund-policy" element={<RefundPolicyPage />} />
       </Routes>
 
       <CTAFooterSection />

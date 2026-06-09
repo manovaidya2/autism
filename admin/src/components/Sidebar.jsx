@@ -48,6 +48,7 @@ const Sidebar = () => {
         { label: "Blogs", path: "/Admin-blogs", icon: <FaClipboardList /> },
         { label: "Contact Us", path: "/Admin-Autism", icon: <MdPsychology /> },
         { label: "OPD Consents", path: "/admin/opd-consents", icon: <FaClipboardList /> },
+        { label: "Refund Policy", path: "/admin/refund-policy", icon: <FaClipboardList /> },
         { label: "Therapies", path: "/admin-autism-therapies", icon: <FaHeartbeat /> },
       ],
       type: "dropdown",
