@@ -3,6 +3,7 @@ import {
   createOPDConsent,
   getAllOPDConsents,
   getOPDConsentById,
+  downloadOPDConsentPDF,
   deleteOPDConsent
 } from '../controllers/opdConsentController.js';
 
@@ -13,6 +14,7 @@ router.post('/create', createOPDConsent);
 
 // Admin - list/fetch/delete (authentication middleware can be added)
 router.get('/all', getAllOPDConsents);
+router.get('/download/:id', downloadOPDConsentPDF);
 router.get('/:id', getOPDConsentById);
 router.delete('/:id', deleteOPDConsent);
 

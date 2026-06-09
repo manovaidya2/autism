@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react';
 import axiosInstance from '../api/axiosInstance';
 import { Trash2, Search, Eye, Download, Printer, FileText } from 'lucide-react';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 
 const StatCard = ({ title, value, accent }) => (
   <div className="bg-white shadow rounded-lg p-4 flex-1">
@@ -18,6 +16,7 @@ const StatCard = ({ title, value, accent }) => (
 const AdminOPDConsents = () => {
   const [consents, setConsents] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [selected, setSelected] = useState(null);
   const [query, setQuery] = useState('');
   const modalContentRef = useRef(null);
@@ -160,63 +159,32 @@ const AdminOPDConsents = () => {
     }, 500);
   };
 
-  // Function to download as PDF
+  // Function to download as PDF from backend
   const downloadPDF = async () => {
-    if (!modalContentRef.current) return;
-    
-    const element = modalContentRef.current;
-    const originalOverflow = element.style.overflow;
-    element.style.overflow = 'visible';
-    
+    if (!selected?._id) return;
+    setDownloading(true);
+
     try {
-      // Show loading indicator
-      const loadingToast = document.createElement('div');
-      loadingToast.textContent = 'Generating PDF...';
-      loadingToast.style.cssText = 'position:fixed;top:20px;right:20px;background:#333;color:#fff;padding:10px 20px;border-radius:5px;z-index:10000;';
-      document.body.appendChild(loadingToast);
-      
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        backgroundColor: '#ffffff',
-        logging: false,
-        useCORS: true,
-        allowTaint: false
+      const response = await axiosInstance.get(`/opd-consent/download/${selected._id}`, {
+        responseType: 'blob'
       });
-      
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-      
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
-      
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-      
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-      
-      pdf.save(`consent_${selected?.patientName || 'patient'}_${selected?._id || Date.now()}.pdf`);
-      
-      loadingToast.textContent = 'PDF Downloaded!';
-      setTimeout(() => loadingToast.remove(), 2000);
+
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const patientName = (selected.patientName || 'patient').replace(/[^a-z0-9_-]+/gi, '_');
+
+      link.href = url;
+      link.download = `OPD_Consent_${patientName}_${selected._id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('PDF generation error:', error);
-      alert('Error generating PDF. Please try again.');
+      console.error('PDF download error:', error);
+      alert('Error downloading PDF. Please try again.');
     } finally {
-      element.style.overflow = originalOverflow;
-      const toast = document.querySelector('div[style*="position:fixed"][style*="top:20px"]');
-      if (toast) toast.remove();
+      setDownloading(false);
     }
   };
 
@@ -301,9 +269,10 @@ const AdminOPDConsents = () => {
                   </button>
                   <button 
                     onClick={downloadPDF}
+                    disabled={downloading}
                     className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm"
                   >
-                    <FileText size={16} /> Download PDF
+                    <FileText size={16} /> {downloading ? 'Downloading...' : 'Download PDF'}
                   </button>
                   <button 
                     onClick={() => setSelected(null)} 
