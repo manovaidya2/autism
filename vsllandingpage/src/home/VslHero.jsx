@@ -162,10 +162,10 @@ export default function VslHero() {
 
         {/* PRICE RIBBON */}
         <div className="absolute top-6 right-6 z-10">
-          <div className="bg-[#d6a22e] text-[#0b2f1d] px-6 py-3 rounded-full shadow-lg transform rotate-6 hover:rotate-0 transition-transform duration-300">
+          {/* <div className="bg-[#d6a22e] text-[#0b2f1d] px-6 py-3 rounded-full shadow-lg transform rotate-6 hover:rotate-0 transition-transform duration-300">
             <p className="text-[10px] uppercase tracking-wider font-bold">ONLY</p>
             <p className="text-2xl font-bold">₹599 <span className="text-sm font-normal line-through opacity-70">₹1999</span></p>
-          </div>
+          </div> */}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">

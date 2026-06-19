@@ -205,6 +205,17 @@ export default function VideoTestimonials() {
           All videos shared with explicit parental consent. Faces and names approved for public use.
         </p>
 
+        <div className="mt-6 flex justify-center">
+          <a
+            href="https://manovaidya.in/testimonials.php"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center rounded-full bg-[#8B43BA] px-9 py-5 text-large font-bold text-white shadow-sm transition-all hover:bg-[#d6a22e] hover:text-[#0b2f1d]"
+          >
+            Read More
+          </a>
+        </div>
+
       </div>
     </section>
   );
