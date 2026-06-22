@@ -23,7 +23,8 @@ const RefundPolicyPage = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const canvasRef = useRef(null);
-  const [isDrawing, setIsDrawing] = useState(false);
+  const isDrawingRef = useRef(false);
+  const drawnSignatureRef = useRef('');
   const [signatureError, setSignatureError] = useState('');
 
   // Hindi content based on the PDF
@@ -85,11 +86,11 @@ const RefundPolicyPage = () => {
     const ctx = canvas.getContext('2d');
     ctx.beginPath();
     ctx.moveTo(x, y);
-    setIsDrawing(true);
+    isDrawingRef.current = true;
   };
 
   const draw = (e) => {
-    if (!isDrawing) return;
+    if (!isDrawingRef.current) return;
     
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
@@ -120,18 +121,25 @@ const RefundPolicyPage = () => {
   };
 
   const stopDrawing = () => {
-    setIsDrawing(false);
+    if (!isDrawingRef.current) return;
+    isDrawingRef.current = false;
     const canvas = canvasRef.current;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     ctx.beginPath();
     const signatureDataUrl = canvas.toDataURL();
+    drawnSignatureRef.current = signatureDataUrl;
     setFormData(prev => ({ ...prev, signatureData: signatureDataUrl }));
   };
 
   const clearSignature = () => {
+    isDrawingRef.current = false;
+    drawnSignatureRef.current = '';
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
     setFormData(prev => ({ ...prev, signatureData: '' }));
   };
 
@@ -144,12 +152,7 @@ const RefundPolicyPage = () => {
       }
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, signatureFile: reader.result, signatureData: '' }));
-        const canvas = canvasRef.current;
-        if (canvas) {
-          const ctx = canvas.getContext('2d');
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
+        setFormData(prev => ({ ...prev, signatureFile: reader.result }));
       };
       reader.readAsDataURL(file);
     }
@@ -158,21 +161,30 @@ const RefundPolicyPage = () => {
   const handleSignatureTypeChange = (type) => {
     setFormData(prev => ({ ...prev, signatureType: type }));
     setSignatureError('');
-    if (type === 'draw') {
-      setFormData(prev => ({ ...prev, signatureFile: null }));
-    } else {
-      clearSignature();
-      setFormData(prev => ({ ...prev, signatureData: '' }));
-    }
   };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       [name]: type === 'checkbox' ? checked : value
-    });
+    }));
   };
+
+  React.useEffect(() => {
+    if (formData.signatureType !== 'draw' || !drawnSignatureRef.current || !canvasRef.current) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const signature = new Image();
+    signature.onload = () => {
+      if (canvasRef.current === canvas) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(signature, 0, 0, canvas.width, canvas.height);
+      }
+    };
+    signature.src = drawnSignatureRef.current;
+  }, [formData.signatureType]);
 
   const validateSignature = () => {
     if (formData.signatureType === 'draw' && !formData.signatureData) {

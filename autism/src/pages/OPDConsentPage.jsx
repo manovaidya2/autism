@@ -25,11 +25,17 @@ const OpdConsentForm = () => {
   // Canvas refs
   const canvasRef = useRef(null);
   const ctxRef = useRef(null);
+  const drawnSignatureRef = useRef(null);
+  const hasDrawnSignatureRef = useRef(false);
   
   // Initialize canvas
   const initCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    // Resizing a canvas clears it. Keep the completed signature so focusing a
+    // field (mobile keyboard resize) or switching signature tabs cannot erase it.
+    const savedSignature = drawnSignatureRef.current;
     
     canvas.width = canvas.offsetWidth;
     canvas.height = 150;
@@ -42,11 +48,22 @@ const OpdConsentForm = () => {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctxRef.current = ctx;
+
+    if (savedSignature) {
+      const signature = new Image();
+      signature.onload = () => {
+        if (canvasRef.current === canvas) {
+          ctx.drawImage(signature, 0, 0, canvas.width, canvas.height);
+        }
+      };
+      signature.src = savedSignature;
+    }
   };
   
   // Start drawing
   const startDrawing = (e) => {
     setIsDrawing(true);
+    hasDrawnSignatureRef.current = true;
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
@@ -77,12 +94,18 @@ const OpdConsentForm = () => {
   // Stop drawing
   const stopDrawing = () => {
     setIsDrawing(false);
-    ctxRef.current.beginPath();
+    ctxRef.current?.beginPath();
+    if (hasDrawnSignatureRef.current && canvasRef.current) {
+      drawnSignatureRef.current = canvasRef.current.toDataURL();
+    }
   };
   
   // Clear canvas
   const clearCanvas = () => {
+    drawnSignatureRef.current = null;
+    hasDrawnSignatureRef.current = false;
     const canvas = canvasRef.current;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#ffffff';
@@ -96,8 +119,8 @@ const OpdConsentForm = () => {
   
   // Get signature as data URL
   const getSignatureDataURL = () => {
-    if (signatureMethod === 'draw' && canvasRef.current) {
-      return canvasRef.current.toDataURL();
+    if (signatureMethod === 'draw') {
+      return drawnSignatureRef.current || canvasRef.current?.toDataURL() || null;
     }
     return signatureImage;
   };
@@ -144,8 +167,7 @@ const OpdConsentForm = () => {
 
     // Check signature based on method
     if (signatureMethod === 'draw') {
-      const canvas = canvasRef.current;
-      if (!canvas || canvas.toDataURL() === canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height)) {
+      if (!hasDrawnSignatureRef.current || !drawnSignatureRef.current) {
         alert(activeLang === 'hindi' ? 'कृपया कैनवास पर हस्ताक्षर करें' : 'Please draw your signature on the canvas');
         return;
       }
