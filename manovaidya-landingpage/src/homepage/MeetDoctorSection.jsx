@@ -3,21 +3,15 @@ import {
   CalendarCheck,
   Check,
   Clock3,
-  Expand,
   Heart,
-  Play,
-  Settings,
-  SkipBack,
-  Volume2,
 } from "lucide-react";
-import doctorPortrait from "../images/doctor-ankush-portrait.png";
 
 const highlights = [
   "7+ Years of Experience",
   "Thousands of Families Guided",
   "Expert in Child, Teen, Adult & Family Wellness",
   "Neuro-Ayurveda Practitioner",
-  "Online Consultations Across India",
+  "Clinic at VS Plaza, Sector 27, Noida",
 ];
 
 function MeetDoctorSection() {
@@ -36,41 +30,17 @@ function MeetDoctorSection() {
         </div>
 
         <div className="mt-5 grid gap-5 sm:gap-8 lg:grid-cols-[1.18fr_0.82fr] lg:items-stretch">
-          <div className="relative overflow-hidden rounded-[16px] bg-[#111827] shadow-[0_14px_34px_rgba(17,24,39,0.18)]">
-            <div className="relative h-[235px] min-[390px]:h-[270px] sm:h-[390px] lg:h-[430px]">
-              <img
-                src={doctorPortrait}
-                alt="Dr. Ankush Garg video introduction"
-                className="h-full w-full object-cover object-[center_30%]"
+          <div className="relative h-fit self-start overflow-hidden rounded-[16px] bg-[#111827] shadow-[0_14px_34px_rgba(17,24,39,0.18)]">
+            <div className="relative aspect-video">
+              <iframe
+                className="h-full w-full"
+                src="https://www.youtube.com/embed/0Qk6Es79TjA?si=YqFmIfx2tcW5LgNL&cc_load_policy=0&iv_load_policy=3&modestbranding=1&rel=0&playsinline=1"
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-
-              <button
-                type="button"
-                aria-label="Play doctor introduction video"
-                className="absolute left-1/2 top-1/2 flex h-[72px] w-[72px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[4px] border-white/95 bg-black/28 text-white shadow-[0_18px_38px_rgba(0,0,0,0.35)] backdrop-blur-[1px] sm:h-[106px] sm:w-[106px] sm:border-[5px]"
-              >
-                <Play className="ml-1.5 h-8 w-8 fill-white sm:ml-2 sm:h-12 sm:w-12" strokeWidth={1.5} />
-              </button>
-
-              <div className="absolute bottom-0 left-0 right-0 px-3 pb-3 sm:px-5 sm:pb-4">
-                <div className="h-[4px] overflow-hidden rounded-full bg-white/70">
-                  <div className="h-full w-[18%] rounded-full bg-[#ee3328]" />
-                </div>
-
-                <div className="mt-3 flex items-center justify-between gap-3 text-white sm:mt-4 sm:gap-4">
-                  <div className="flex min-w-0 items-center gap-3 sm:gap-5">
-                    <Play className="h-5 w-5 shrink-0 fill-white sm:h-7 sm:w-7" strokeWidth={1.6} />
-                    <SkipBack className="h-5 w-5 shrink-0 rotate-180 fill-white sm:h-7 sm:w-7" strokeWidth={1.8} />
-                    <Volume2 className="h-5 w-5 shrink-0 sm:h-7 sm:w-7" strokeWidth={2} />
-                    <span className="truncate text-[12px] font-bold min-[380px]:text-[14px] sm:text-[17px]">0:00 / 2:15</span>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-3 sm:gap-4">
-                    <Settings className="h-5 w-5 sm:h-7 sm:w-7" strokeWidth={2} />
-                    <Expand className="h-5 w-5 sm:h-7 sm:w-7" strokeWidth={2} />
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
 

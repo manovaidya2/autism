@@ -1,33 +1,40 @@
 import React from "react";
-import { ArrowRight, Clapperboard, Play } from "lucide-react";
-import supportWomen from "../images/support-women.webp";
-import doctorPortrait from "../images/doctor-ankush-portrait.png";
-import supportSeniors from "../images/support-seniors.webp";
+import { ArrowLeft, ArrowRight, Clapperboard } from "lucide-react";
+import { Link } from "react-router-dom";
+import { storyVideos } from "../data/storyVideos";
 
-const sampleVideo = "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
-
-const stories = [
-  {
-    quote: '"My son is more confident\nand calm now."',
-    byline: "- Mother of 8 Year Old",
-    duration: "2:02",
-    poster: supportWomen,
-  },
-  {
-    quote: '"Anxiety and overthinking\nhave reduced a lot."',
-    byline: "- Patient, 26 Years",
-    duration: "1:54",
-    poster: doctorPortrait,
-  },
-  {
-    quote: '"Better sleep & memory\nimproved a lot."',
-    byline: "- Father of 62 Year Old",
-    duration: "1:47",
-    poster: supportSeniors,
-  },
-];
+function StoryVideoCard({ video }) {
+  return (
+    <article className="min-w-0">
+      <div className="overflow-hidden rounded-[10px] bg-[#111827] shadow-[0_10px_24px_rgba(21,27,58,0.14)]">
+        <div className="aspect-video">
+          <iframe
+            className="h-full w-full"
+            src={video.src}
+            title={video.title}
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
+        </div>
+      </div>
+    </article>
+  );
+}
 
 function StoriesSection() {
+  const [activeIndex, setActiveIndex] = React.useState(0);
+  const visibleVideos = Array.from({ length: 3 }, (_, offset) => storyVideos[(activeIndex + offset) % storyVideos.length]);
+
+  const goPrevious = () => {
+    setActiveIndex((current) => (current === 0 ? storyVideos.length - 1 : current - 1));
+  };
+
+  const goNext = () => {
+    setActiveIndex((current) => (current === storyVideos.length - 1 ? 0 : current + 1));
+  };
+
   return (
     <section id="success-stories" className="scroll-mt-24 bg-[#fbfbff] px-4 pb-12 sm:px-6 lg:px-10">
       <div className="mx-auto grid gap-8 lg:grid-cols-[1fr_300px] lg:items-stretch">
@@ -41,33 +48,44 @@ function StoriesSection() {
             </p>
           </div>
 
-          <div className="mt-7 grid gap-8 md:grid-cols-3">
-            {stories.map(({ quote, byline, duration, poster }) => (
-              <article key={quote}>
-                <div className="relative overflow-hidden rounded-[10px] bg-[#1f2937] shadow-[0_10px_24px_rgba(21,27,58,0.14)]">
-                  <video
-                    className="h-[166px] w-full object-cover"
-                    controls
-                    muted
-                    preload="metadata"
-                    poster={poster}
-                    src={sampleVideo}
-                  />
-                  <div className="pointer-events-none absolute inset-0 bg-black/10" />
-                  <div className="pointer-events-none absolute left-1/2 top-1/2 flex h-[76px] w-[76px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[4px] border-white/90 bg-black/20 text-white shadow-[0_12px_24px_rgba(0,0,0,0.28)]">
-                    <Play className="ml-1 h-9 w-9 fill-white" strokeWidth={1.5} />
-                  </div>
-                  <span className="pointer-events-none absolute bottom-2 right-2 rounded-[6px] bg-black/78 px-2.5 py-1 text-[16px] font-black text-white">
-                    {duration}
-                  </span>
-                </div>
+          <div className="mt-7">
+            <div className="grid gap-5 md:grid-cols-3">
+              {visibleVideos.map((video) => (
+                <StoryVideoCard key={video.id} video={video} />
+              ))}
+            </div>
 
-                <p className="mt-5 whitespace-pre-line text-[16px] font-black leading-[1.45] text-[#202746]">
-                  {quote}
-                </p>
-                <p className="mt-4 text-[16px] font-bold text-[#3e465d]">{byline}</p>
-              </article>
-            ))}
+            <div className="mt-5 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                aria-label="Previous story"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-[#d9e4df] bg-white text-[#07584c] shadow-sm transition hover:border-[#0d6a56] hover:bg-[#edf7f4]"
+                onClick={goPrevious}
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <div className="flex max-w-[220px] items-center gap-2 overflow-hidden">
+                {storyVideos.map((video, index) => (
+                  <button
+                    key={video.id}
+                    type="button"
+                    aria-label={`Go to story slide ${index + 1}`}
+                    className={`h-2.5 rounded-full transition-all ${
+                      activeIndex === index ? "w-8 bg-[#7a3fe0]" : "w-2.5 bg-[#d6dce6]"
+                    }`}
+                    onClick={() => setActiveIndex(index)}
+                  />
+                ))}
+              </div>
+              <button
+                type="button"
+                aria-label="Next story"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-[#d9e4df] bg-white text-[#07584c] shadow-sm transition hover:border-[#0d6a56] hover:bg-[#edf7f4]"
+                onClick={goNext}
+              >
+                <ArrowRight className="h-5 w-5" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -83,13 +101,13 @@ function StoriesSection() {
             <br />
             from our community.
           </p>
-          <a
-            href="/#success-stories"
+          <Link
+            to="/stories"
             className="mt-7 inline-flex h-[58px] w-full items-center justify-center gap-4 rounded-[8px] bg-[#7a3fe0] px-6 text-[18px] font-black text-white shadow-[0_14px_24px_rgba(122,63,224,0.25)] transition hover:bg-[#6932c8]"
           >
             View All Stories
             <ArrowRight className="h-6 w-6" strokeWidth={2.5} />
-          </a>
+          </Link>
         </aside>
       </div>
     </section>

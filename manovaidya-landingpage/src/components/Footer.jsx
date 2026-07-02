@@ -67,6 +67,18 @@ const socialLinks = [
   { label: "LinkedIn", href: "#linkedin", icon: LinkedinIcon },
 ];
 
+const contact = {
+  phone: "+91 78238 38638",
+  phoneHref: "tel:+917823838638",
+  whatsappHref: "https://wa.me/917823838638",
+  email: "manovaidya2@gmail.com",
+  emailHref: "mailto:manovaidya2@gmail.com",
+  address:
+    "VS Plaza, near Vinayak Hospital, Atta Market, Pocket E, Sector 27, Noida, Uttar Pradesh 201301",
+  mapHref:
+    "https://www.google.com/maps/dir//VS+Plaza,+near+vinayak+hospital,+Atta+Market,+Pocket+E,+Sector+27,+Noida,+Uttar+Pradesh+201301/@28.5712316,77.2457028,12z/data=!4m8!4m7!1m0!1m5!1m1!1s0x390ce583bc378b69:0xf1a912b86caf94f8!2m2!1d77.3282163!2d28.571336?entry=ttu",
+};
+
 function Footer() {
   return (
     <footer id="resources" className="scroll-mt-24 border-t border-[#edf1ee] bg-white text-[#121832]">
@@ -146,7 +158,7 @@ function Footer() {
           <h3 className="text-[14px] font-black leading-tight text-[#11172e]">We're Here to Help</h3>
           <div className="mt-4 space-y-3">
             <a
-              href="https://wa.me/919999949939"
+              href={contact.whatsappHref}
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-3 text-[#101831] transition hover:text-[#07584c]"
@@ -154,25 +166,30 @@ function Footer() {
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#eaf7f1] text-[#17804f]">
                 <MessageCircle className="h-5 w-5" strokeWidth={2.4} />
               </span>
-              <span className="text-[21px] font-black leading-none">+91 99999 49939</span>
+              <span className="text-[21px] font-black leading-none">{contact.phone}</span>
             </a>
 
             <a
-              href="mailto:support@manovaidya.com"
+              href={contact.emailHref}
               className="flex items-center gap-3 text-[#31384d] transition hover:text-[#07584c]"
             >
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#edf7f4] text-[#2f8a73]">
                 <Mail className="h-5 w-5" strokeWidth={2.2} />
               </span>
-              <span className="text-[14px] font-extrabold">support@manovaidya.com</span>
+              <span className="text-[14px] font-extrabold">{contact.email}</span>
             </a>
 
-            <p className="flex items-center gap-3 text-[#31384d]">
+            <a
+              href={contact.mapHref}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-start gap-3 text-[#31384d] transition hover:text-[#07584c]"
+            >
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#edf7f4] text-[#2f8a73]">
                 <MapPin className="h-5 w-5" strokeWidth={2.2} />
               </span>
-              <span className="text-[14px] font-extrabold">Online Consultations Across India</span>
-            </p>
+              <span className="text-[14px] font-extrabold leading-snug">{contact.address}</span>
+            </a>
           </div>
         </div>
       </div>

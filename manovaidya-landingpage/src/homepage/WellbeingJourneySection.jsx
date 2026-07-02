@@ -11,18 +11,22 @@ import wellbeingBanner from "../images/wellbeing-journey-banner.png";
 const contactItems = [
   {
     label: "Call / WhatsApp",
-    value: "+91 99999 49939",
+    value: "+91 78238 38638",
     icon: Phone,
+    href: "tel:+917823838638",
   },
   {
     label: "Email",
-    value: "support@manovaidya.com",
+    value: "manovaidya2@gmail.com",
     icon: Mail,
+    href: "mailto:manovaidya2@gmail.com",
   },
   {
-    label: "Online Consultations",
-    value: "Across India",
+    label: "Location",
+    value: "VS Plaza, Sector 27, Noida",
     icon: MapPin,
+    href:
+      "https://www.google.com/maps/dir//VS+Plaza,+near+vinayak+hospital,+Atta+Market,+Pocket+E,+Sector+27,+Noida,+Uttar+Pradesh+201301/@28.5712316,77.2457028,12z/data=!4m8!4m7!1m0!1m5!1m1!1s0x390ce583bc378b69:0xf1a912b86caf94f8!2m2!1d77.3282163!2d28.571336?entry=ttu",
   },
   {
     label: "100% Confidential",
@@ -76,20 +80,38 @@ function WellbeingJourneySection() {
         </div>
 
         <div className="grid bg-white md:grid-cols-2 lg:grid-cols-4">
-          {contactItems.map(({ label, value, icon: Icon }) => (
-            <div
+          {contactItems.map(({ label, value, icon: Icon, href }) => {
+            const content = (
+              <React.Fragment>
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#2c8a45]">
+                  <Icon className="h-9 w-9" strokeWidth={1.9} />
+                </span>
+                <div>
+                  <p className="text-[14px] font-black leading-tight text-[#596173]">{label}</p>
+                  <p className="mt-2 text-[17px] font-black leading-tight text-[#101a36] sm:text-[19px]">{value}</p>
+                </div>
+              </React.Fragment>
+            );
+
+            return href ? (
+              <a
+                key={label}
+                href={href}
+                target={href.startsWith("http") ? "_blank" : undefined}
+                rel={href.startsWith("http") ? "noreferrer" : undefined}
+                className="flex min-h-[96px] items-center justify-center gap-5 border-t border-[#e8e7f0] px-6 py-4 transition hover:bg-[#f8fcfa] lg:border-r lg:last:border-r-0"
+              >
+                {content}
+              </a>
+            ) : (
+              <div
               key={label}
               className="flex min-h-[96px] items-center justify-center gap-5 border-t border-[#e8e7f0] px-6 py-4 lg:border-r lg:last:border-r-0"
             >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#2c8a45]">
-                <Icon className="h-9 w-9" strokeWidth={1.9} />
-              </span>
-              <div>
-                <p className="text-[14px] font-black leading-tight text-[#596173]">{label}</p>
-                <p className="mt-2 text-[19px] font-black leading-tight text-[#101a36]">{value}</p>
+                {content}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

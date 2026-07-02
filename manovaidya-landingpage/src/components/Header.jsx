@@ -204,7 +204,7 @@ function Header() {
               Book Consultation
             </a>
             <a
-              href="tel:+919523435814"
+              href="tel:+917823838638"
               className="mt-3 flex h-12 items-center justify-center gap-2 rounded-md border border-[#d5e2dc] bg-white px-5 text-sm font-extrabold text-[#064f43] transition hover:bg-[#edf7f4]"
             >
               <PhoneCall className="h-4 w-4" />
